@@ -1,206 +1,216 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mittagstisch">
-<meta name="theme-color" content="#073334">
-<title>Krone Mittagstisch</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js"></script>
-<style>
-  :root{--g:#073334;--o:#C9A227}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:'Quicksand',system-ui,sans-serif;color:#1a1a1a;background:#f4f1e8}
-  header{background:var(--g);color:#fff;padding:18px 16px;text-align:center}
-  header b{color:var(--o);letter-spacing:.2em;font-size:13px}
-  header h1{margin:4px 0 0;font-weight:500;font-size:26px}
-  main{max-width:640px;margin:0 auto;padding:14px}
-  label{display:block;font-weight:700;color:var(--g);margin:12px 0 4px;font-size:14px}
-  input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #cfc9b6;border-radius:10px;background:#fff}
-  button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 16px;cursor:pointer}
-  .main{background:var(--g);color:#fff;width:100%;margin-top:14px;font-size:17px}
-  .alt{background:var(--o);color:#1a1a1a}
-  .row{display:flex;gap:10px;margin-top:12px}.row button{flex:1}
-  #status{margin:12px 0;color:#444;font-size:14px;white-space:pre-wrap}
-  #status.err{color:#a02020}
-  details{margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #cfc9b6}
-  summary{font-weight:700;color:var(--g)}
-  #sheet{display:none;background:#fff;margin-top:16px;padding:26px 20px;border-radius:6px;box-shadow:0 2px 10px #0002}
-  .brand{text-align:center;color:var(--o);letter-spacing:.25em;font-weight:700;font-size:14px}
-  .title{text-align:center;color:var(--g);font-size:36px;line-height:1.1;margin:4px 0}
-  .sub{text-align:center;color:var(--g);font-size:12px;padding-bottom:12px;border-bottom:2px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:26px;margin:8px 0 10px}
-  .dish{display:flex;align-items:baseline;gap:6px;margin:0 0 10px;font-size:16px}
-  .dish .n{outline:none}
-  .dish .dots{flex:1;border-bottom:2px dotted #888;transform:translateY(-4px);min-width:12px}
-  .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap}
-  .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
-  @media print{
-    @page{size:A4;margin:20mm 23mm}
-    body{background:#fff}header,main>*:not(#sheet),.hint{display:none!important}
-    main{padding:0;max-width:none}
-    #sheet{display:block!important;box-shadow:none;margin:0;padding:0}
-    .title{font-size:40px}.day{font-size:28px}.dish{font-size:17px}
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Krone Mittagstisch Generator</title>
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --dark: #2C3E50;
+      --light-bg: #F9F9F9;
+      --border: #E5E7EB;
+    }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #f3f4f6;
+      color: var(--dark);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      max-width: 600px;
+      width: 100%;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 15px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      margin: 5px 0 0 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #7F8C8D;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--gold);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #C29B30;
+    }
+
+    #status {
+      text-align: center;
+      font-style: italic;
+      color: #7F8C8D;
+      margin: 15px 0;
+    }
+
+    /* 🍽️ Stile Elegante del Menù Risultato */
+    .menu-box {
+      margin-top: 30px;
+      padding: 25px;
+      border: 1px solid var(--gold);
+      background-color: var(--light-bg);
+      border-radius: 8px;
+    }
+
+    .menu-day-title {
+      text-align: center;
+      font-size: 22px;
+      color: var(--gold);
+      margin-top: 0;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: bold;
+    }
+
+    .dish-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dish-row:last-child {
+      border-bottom: none;
+    }
+
+    .dish-name {
+      font-weight: bold;
+      font-size: 14px;
+      padding-right: 15px;
+      color: var(--dark);
+    }
+
+    .dish-price {
+      font-weight: bold;
+      font-size: 14px;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .footer-decor {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 12px;
+      color: #95A5A6;
+      border-top: 1px dashed var(--gold);
+      padding-top: 15px;
+    }
+  </style>
 </head>
 <body>
-<header><b>KRONE</b><h1>Mittagstisch</h1></header>
-<main>
-  <label for="url">Link della pagina</label>
-  <input id="url" type="url" inputmode="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
-  <label for="day">Giorno</label>
-  <select id="day"></select>
-  <button class="main" id="go">Crea menù</button>
+
+<div class="container">
+  <div class="header">
+    <h1>👑 TRATTORIA PIZZERIA KRONE</h1>
+    <p>Mittagstisch • Menù del Giorno</p>
+  </div>
+
+  <div class="form-group">
+    <label for="url">URL della pagina del menù:</label>
+    <input type="text" id="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
+  </div>
+
+  <div class="form-group">
+    <label for="day">Seleziona il Giorno:</label>
+    <select id="day">
+      <option value="Montag">Lunedì (Montag)</option>
+      <option value="Dienstag">Martedì (Dienstag)</option>
+      <option value="Mittwoch">Mercoledì (Mittwoch)</option>
+      <option value="Donnerstag">Giovedì (Donnerstag)</option>
+      <option value="Freitag">Venerdì (Freitag)</option>
+      <option value="Samstag">Sabato (Samstag)</option>
+      <option value="Sonntag">Domenica (Sonntag)</option>
+    </select>
+  </div>
+
+  <button id="go">Genera Menù Elegante</button>
+
   <div id="status"></div>
 
-  <div id="sheet">
-    <div class="brand">KRONE</div>
-    <div class="title">Mittagstisch</div>
-    <div class="sub">Trattoria · Pizzeria</div>
-    <div class="day" id="sheetDay"></div>
-    <div id="dishes"></div>
+  <!-- Il Menù generato apparirà qui -->
+  <div id="result-container" style="display: none;">
+    <div class="menu-box" id="menu-box">
+      <h2 class="menu-day-title" id="menu-day">MONTAG</h2>
+      <div id="dishes-list"></div>
+      <div class="footer-decor">
+        Pizzeria & Trattoria Krone seit 2010 🇮🇹
+      </div>
+    </div>
   </div>
-  <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
-  <div class="row" id="actions" style="display:none">
-    <button class="alt" id="word">Scarica Word</button>
-    <button class="alt" id="pdf">Stampa / PDF</button>
-  </div>
-
-  <details>
-    <summary>Se non legge il sito: incolla il testo</summary>
-    <p style="font-size:13px;margin:8px 0">Copia dal sito il giorno con i piatti e i prezzi (il nome del giorno su una riga, poi piatto e prezzo, uno per riga) e incollalo qui.</p>
-    <textarea id="paste" rows="8" placeholder="Montag&#10;Pizza mit Schinken und Salami&#10;11&#10;..."></textarea>
-    <button class="main" id="usePaste">Usa il testo incollato</button>
-  </details>
-</main>
+</div>
 
 <script>
-const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-const PRICE = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
-const FONT = "Quicksand", GREEN = "073334", GOLD = "C9A227";
+  const \$ = id => document.getElementById(id);
 
-function parseDay(text, day) {
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const daysLow = DAYS.map(d => d.toLowerCase());
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].toLowerCase() !== day.toLowerCase()) continue;
-    const dishes = []; let buf = [];
-    for (let j = i + 1; j < lines.length; j++) {
-      const x = lines[j];
-      if (daysLow.includes(x.toLowerCase())) break;
-      const m = x.match(PRICE);
-      if (m) { if (buf.length) dishes.push([buf.slice(-2).join(" "), m[1]]); buf = []; }
-      else { buf.push(x); if (dishes.length && buf.length > 3) break; }
-    }
-    if (dishes.length) return dishes;
-  }
-  return [];
-}
+  // Funzione di parsing del testo del menù
+  function parseDay(text, day) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    let dayIdx = -1;
 
-function buildDocx(day, dishes) {
-  const { Document, Paragraph, TextRun, AlignmentType, BorderStyle, TabStopType, LeaderType, Tab } = docx;
-  const kids = [
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 },
-      children: [new TextRun({ text: "KRONE", font: FONT, size: 28, bold: true, color: GOLD, characterSpacing: 120 })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 },
-      children: [new TextRun({ text: "Mittagstisch", font: FONT, size: 64, color: GREEN })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 360 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: GOLD, space: 8 } },
-      children: [new TextRun({ text: "Trattoria · Pizzeria", font: FONT, size: 22, color: GREEN })] }),
-    new Paragraph({ spacing: { before: 240, after: 160 }, keepNext: true,
-      children: [new TextRun({ text: day, font: FONT, size: 44, color: GREEN })] }),
-  ];
-  for (const [name, price] of dishes) {
-    kids.push(new Paragraph({ spacing: { after: 140 }, keepLines: true,
-      tabStops: [{ type: TabStopType.RIGHT, position: 9298, leader: LeaderType.DOT }],
-      children: [
-        new TextRun({ text: name, font: FONT, size: 26, color: "1A1A1A" }),
-        new TextRun({ children: [new Tab(), price + " €"], font: FONT, size: 26, bold: true, color: GREEN }),
-      ] }));
-  }
-  return new Document({
-    styles: { default: { document: { run: { font: FONT, size: 26 } } } },
-    sections: [{ properties: { page: { size: { width: 11906, height: 16838 },
-      margin: { top: 1134, bottom: 1134, left: 1304, right: 1304 } } }, children: kids }],
-  });
-}
-
-/* ---------- Interfaccia ---------- */
-if (typeof document !== "undefined") {
-  const $ = id => document.getElementById(id);
-  const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
-  DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
-  $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
-
-  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
-
-  function show(day, dishes) {
-    $("sheetDay").textContent = day;
-    $("dishes").innerHTML = "";
-    dishes.forEach(([n, p]) => {
-      const row = document.createElement("div"); row.className = "dish";
-      row.innerHTML = '<span class="n" contenteditable="true"></span><span class="dots"></span><span class="p" contenteditable="true"></span>';
-      row.querySelector(".n").textContent = n;
-      row.querySelector(".p").textContent = p + " €";
-      $("dishes").appendChild(row);
-    });
-    $("sheet").style.display = "block";
-    $("actions").style.display = "flex";
-    $("hint").style.display = "block";
-    status("Fatto: " + dishes.length + " piatti per " + day + ".");
-    $("sheet").scrollIntoView({ behavior: "smooth" });
-  }
-
-  function current() {
-    const day = $("sheetDay").textContent;
-    const dishes = [...document.querySelectorAll("#dishes .dish")].map(r => [
-      r.querySelector(".n").textContent.trim(),
-      r.querySelector(".p").textContent.replace(/€/g, "").trim(),
-    ]).filter(d => d[0]);
-    return { day, dishes };
-  }
-
-  $("go").onclick = async () => {
-    const day = $("day").value;
-    status("Leggo la pagina…");
-    try {
-      const r = await fetch("/api/menu?url=" + encodeURIComponent($("url").value.trim()));
-      const j = await r.json();
-      if (j.error) throw new Error(j.error);
-      const dishes = parseDay(j.text, day);
-      if (!dishes.length) {
-        status("Non trovo i piatti di " + day + " nel testo della pagina.\nPuò essere che il sito non sia ancora aggiornato, oppure che carichi i testi in modo che questa app non vede. Usa 'incolla il testo' qui sotto, oppure mandami questo testo letto:\n\n" + j.text.slice(0, 1500), true);
-        return;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].toLowerCase().includes(day.toLowerCase())) {
+        dayIdx = i;
+        break;
       }
-      show(day, dishes);
-    } catch (e) { status("Errore: " + e.message, true); }
-  };
-
-  $("usePaste").onclick = () => {
-    const day = $("day").value;
-    const dishes = parseDay($("paste").value, day);
-    if (!dishes.length) { status("Nel testo incollato non trovo '" + day + "' seguito da piatti e prezzi.", true); return; }
-    show(day, dishes);
-  };
-
-  $("pdf").onclick = () => window.print();
-
-  $("word").onclick = async () => {
-    const { day, dishes } = current();
-    const blob = await docx.Packer.toBlob(buildDocx(day, dishes));
-    const name = "Mittagstisch_" + day + "_" + new Date().toISOString().slice(0, 10) + ".docx";
-    const file = new File([blob], name, { type: blob.type });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
     }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  };
-}
-</script>
-</body>
-</html>
+
+    if (dayIdx === -1) return [];
+
+    const giorni = ["montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag", "sonntag"];
+    let endIdx = 
