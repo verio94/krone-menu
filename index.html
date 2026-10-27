@@ -9,7 +9,8 @@
 <title>Krone Mittagstisch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- Libreria per esportazione immagine esatta -->
+<!-- Librerie per esportazione PDF ed Immagine esatta -->
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{--g:#073334;--o:#C9A227}
@@ -39,15 +40,11 @@
   .flag{display:flex;height:7px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
   .inner{padding:20px 22px 6px}
-  
-  /* ✍️ Scritte Uniformate allo Stile dei Piatti */
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;line-height:1.1;margin:0 0 4px}
+  .title{text-align:center;color:var(--g);font-size:34px;font-weight:700;line-height:1.1;margin:0 0 4px}
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:24px;font-weight:400;margin:6px 0 6px}
-  
-  /* Piatti senza tabelle o righe visive */
+  .day{color:var(--g);font-size:24px;font-weight:700;margin:6px 0 6px}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px}
-  .dish .n{outline:none;font-weight:400;text-align:left}
+  .dish .n{outline:none;text-align:left}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right}
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
@@ -61,7 +58,7 @@
     .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
     .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
     .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}.title{font-size:40px;font-weight:400}.day{font-size:28px;font-weight:400}.dish{font-size:17px;padding:12px 0}
+    .inner{padding:8mm 16mm 0}.title{font-size:40px}.day{font-size:28px}.dish{font-size:17px;padding:12px 0}
   }
 </style>
 </head>
@@ -92,9 +89,10 @@
 
   <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
   
-  <!-- Solo Bottone Salva come Foto -->
+  <!-- Nuovi Bottoni di Esportazione -->
   <div class="row" id="actions" style="display:none">
-    <button class="alt" id="photo" style="width: 100%;">Salva come Foto</button>
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva come PDF</button>
   </div>
 
   <details>
@@ -129,13 +127,12 @@ function parseDay(text, day) {
 }
 
 if (typeof document !== "undefined") {
-  const \$ = id => document.getElementById(id);
+  const $ = id => document.getElementById(id);
   const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
   DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
   $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
-  const status = (t, err) => { \$("status").textContent = t; \$("status").className = err ? "err" : ""; };
+  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
   
-  // Rende visibile il foglio compilato
   function show(day, dishes) {
     $("sheetDay").textContent = day;
     $("dishes").innerHTML = "";
@@ -176,7 +173,75 @@ if (typeof document !== "undefined") {
     show(day, dishes);
   };
   
+  // Funzione universale per salvare i file generati
   async function saveFile(blob, name) {
     const file = new File([blob], name, { type: blob.type });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: name }); ret
+      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  
+  const stamp = () => new Date().toISOString().slice(0, 10);
+  
+  // 📸 FUNZIONE: Salva esattamente come Immagine PNG (html2canvas)
+  $("photo").onclick = async () => {
+    status("Generazione dell'immagine...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2 // Alta definizione per la stampa o condivisione WhatsApp
+      });
+      canvas.toBlob(async (blob) => {
+        const day = $("sheetDay").textContent;
+        await saveFile(blob, "Mittagstisch_" + day + "_" + stamp() + ".png");
+        status("Immagine salvata con successo!");
+      }, "image/png");
+    } catch (e) {
+      status("Errore generazione Foto: " + e.message, true);
+    }
+  };
+
+  // 📄 FUNZIONE: Salva esattamente come PDF basato sull'immagine dello schermo
+  $("pdf").onclick = async () => {
+    status("Generazione del PDF...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
+      const imgData = canvas.toDataURL("image/png");
+      
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      
+      // Impostiamo la pagina A4 esatta
+      const page = pdfDoc.addPage([595.28, 841.89]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+      
+      // Proporzioni per centrare l'immagine nel foglio A4
+      const pWidth = 595.28 - 40; // 20pt margine destro/sinistro
+      const pHeight = (canvas.height * pWidth) / canvas.width;
+      
+      page.drawImage(pngImage, {
+        x: 20,
+        y: 841.89 - pHeight - 20,
+        width: pWidth,
+        height: pHeight,
+      });
+      
+      const pdfBytes = await pdfDoc.save();
+      const day = $("sheetDay").textContent;
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
+      status("PDF salvato con successo!");
+    } catch (e) {
+      status("Errore generazione PDF: " + e.message, true);
+    }
+  };
+}
+</script>
+</body>
+</html>
