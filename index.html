@@ -40,15 +40,11 @@
   .flag{display:flex;height:7px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
   .inner{padding:20px 22px 6px}
-  
-  /* ✍️ Scritte Uniformate allo Stile dei Piatti */
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;line-height:1.1;margin:0 0 4px}
+  .title{text-align:center;color:var(--g);font-size:34px;font-weight:700;line-height:1.1;margin:0 0 4px}
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:24px;font-weight:400;margin:6px 0 6px}
-  
-  /* Piatti senza tabelle o righe visive artificiali */
+  .day{color:var(--g);font-size:24px;font-weight:700;margin:6px 0 6px}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px}
-  .dish .n{outline:none;font-weight:400;text-align:left}
+  .dish .n{outline:none;text-align:left}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right}
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
@@ -57,4 +53,195 @@
     body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;ali
+    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
+    .topband img{height:41.9mm;width:auto}
+    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
+    .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
+    .flag{height:2.8mm;flex:none}
+    .inner{padding:8mm 16mm 0}.title{font-size:40px}.day{font-size:28px}.dish{font-size:17px;padding:12px 0}
+  }
+</style>
+</head>
+<body>
+
+<header><b>KRONE</b><h1>Mittagstisch</h1></header>
+<main>
+  <label for="url">Link della pagina</label>
+  <input id="url" type="url" inputmode="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
+  
+  <label for="day">Giorno</label>
+  <select id="day"></select>
+  
+  <button class="main" id="go">Crea menù</button>
+  <div id="status"></div>
+
+  <!-- Foglio menù visualizzato -->
+  <div id="sheet">
+    <div class="topband"><img src="logo_t.png" alt=""></div>
+    <div class="inner">
+      <div class="title">Mittagstisch</div>
+      <div class="sub">TAGESGERICHTE</div>
+      <div class="day" id="sheetDay"></div>
+      <div id="dishes"></div>
+    </div>
+    <div class="botband"><img src="foot_t.png" alt=""><div class="flag"><i></i><i></i><i></i></div></div>
+  </div>
+
+  <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
+  
+  <!-- Nuovi Bottoni di Esportazione -->
+  <div class="row" id="actions" style="display:none">
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva come PDF</button>
+  </div>
+
+  <details>
+    <summary>Se non legge il sito: incolla il testo</summary>
+    <p style="font-size:13px;margin:8px 0">Copia dal sito il giorno con i piatti e i prezzi (il nome del giorno su una riga, poi piatto e prezzo, uno per riga) e incollalo qui.</p>
+    <textarea id="paste" rows="8" placeholder="Montag&#10;Pizza mit Schinken und Salami&#10;11&#10;..."></textarea>
+    <button class="main" id="usePaste">Usa il testo incollato</button>
+  </details>
+</main>
+
+<script>
+const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+const PRICE = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
+const GREEN = "073334";
+
+function parseDay(text, day) {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const daysLow = DAYS.map(d => d.toLowerCase());
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].toLowerCase() !== day.toLowerCase()) continue;
+    const dishes = []; let buf = [];
+    for (let j = i + 1; j < lines.length; j++) {
+      const x = lines[j];
+      if (daysLow.includes(x.toLowerCase())) break;
+      const m = x.match(PRICE);
+      if (m) { if (buf.length) dishes.push([buf.slice(-2).join(" "), m[1]]); buf = []; }
+      else { buf.push(x); if (dishes.length && buf.length > 3) break; }
+    }
+    if (dishes.length) return dishes;
+  }
+  return [];
+}
+
+if (typeof document !== "undefined") {
+  const $ = id => document.getElementById(id);
+  const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
+  DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
+  $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
+  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
+  
+  function show(day, dishes) {
+    $("sheetDay").textContent = day;
+    $("dishes").innerHTML = "";
+    dishes.forEach(([n, p]) => {
+      const row = document.createElement("div"); row.className = "dish";
+      row.innerHTML = '<span class="n" contenteditable="true"></span><span class="p" contenteditable="true"></span>';
+      row.querySelector(".n").textContent = n;
+      row.querySelector(".p").textContent = p + " €";
+      $("dishes").appendChild(row);
+    });
+    $("sheet").style.display = "block";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+    status("Fatto: " + dishes.length + " piatti per " + day + ".");
+    $("sheet").scrollIntoView({ behavior: "smooth" });
+  }
+  
+  $("go").onclick = async () => {
+    const day = $("day").value;
+    status("Leggo la pagina…");
+    try {
+      const r = await fetch("/api/menu?url=" + encodeURIComponent($("url").value.trim()));
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      const dishes = parseDay(j.text, day);
+      if (!dishes.length) {
+        status("Non trovo i piatti di " + day + " nel testo della pagina.\nPuò essere che il sito non sia ancora aggiornato, oppure che carichi i testi in modo che questa app non vede. Usa 'incolla il testo' qui sotto.\n\n", true);
+        return;
+      }
+      show(day, dishes);
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
+  
+  $("usePaste").onclick = () => {
+    const day = $("day").value;
+    const dishes = parseDay($("paste").value, day);
+    if (!dishes.length) { status("Nel testo incollato non trovo '" + day + "' seguito da piatti e prezzi.", true); return; }
+    show(day, dishes);
+  };
+  
+  // Funzione universale per salvare i file generati
+  async function saveFile(blob, name) {
+    const file = new File([blob], name, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  
+  const stamp = () => new Date().toISOString().slice(0, 10);
+  
+  // 📸 FUNZIONE: Salva esattamente come Immagine PNG (html2canvas)
+  $("photo").onclick = async () => {
+    status("Generazione dell'immagine...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2 // Alta definizione per la stampa o condivisione WhatsApp
+      });
+      canvas.toBlob(async (blob) => {
+        const day = $("sheetDay").textContent;
+        await saveFile(blob, "Mittagstisch_" + day + "_" + stamp() + ".png");
+        status("Immagine salvata con successo!");
+      }, "image/png");
+    } catch (e) {
+      status("Errore generazione Foto: " + e.message, true);
+    }
+  };
+
+  // 📄 FUNZIONE: Salva esattamente come PDF basato sull'immagine dello schermo
+  $("pdf").onclick = async () => {
+    status("Generazione del PDF...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
+      const imgData = canvas.toDataURL("image/png");
+      
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      
+      // Impostiamo la pagina A4 esatta
+      const page = pdfDoc.addPage([595.28, 841.89]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+      
+      // Proporzioni per centrare l'immagine nel foglio A4
+      const pWidth = 595.28 - 40; // 20pt margine destro/sinistro
+      const pHeight = (canvas.height * pWidth) / canvas.width;
+      
+      page.drawImage(pngImage, {
+        x: 20,
+        y: 841.89 - pHeight - 20,
+        width: pWidth,
+        height: pHeight,
+      });
+      
+      const pdfBytes = await pdfDoc.save();
+      const day = $("sheetDay").textContent;
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
+      status("PDF salvato con successo!");
+    } catch (e) {
+      status("Errore generazione PDF: " + e.message, true);
+    }
+  };
+}
+</script>
+</body>
+</html>
