@@ -9,8 +9,9 @@
 <title>Krone Mittagstisch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js"></script>
+<!-- Librerie per esportazione PDF ed Immagine esatta -->
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{--g:#073334;--o:#C9A227}
   *{box-sizing:border-box}
@@ -29,7 +30,9 @@
   #status.err{color:#a02020}
   details{margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #cfc9b6}
   summary{font-weight:700;color:var(--g)}
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden}
+  
+  /* 🖥️ Foglio del Menù (Cosa vedi a schermo) */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
   .topband{background:#073334;padding:14px 0;text-align:center}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
   .botband{background:#073334;margin-top:18px;padding-top:12px}
@@ -37,310 +40,21 @@
   .flag{display:flex;height:7px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
   .inner{padding:20px 22px 6px}
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:700;line-height:1.1;margin:0 0 4px}
+  
+  /* ✍️ Scritte Uniformate allo Stile dei Piatti */
+  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;line-height:1.1;margin:0 0 4px}
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:24px;font-weight:700;margin:6px 0 6px}
+  .day{color:var(--g);font-size:24px;font-weight:400;margin:6px 0 6px}
+  
+  /* Piatti senza tabelle o righe visive artificiali */
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px}
-  .dish .n{outline:none}
+  .dish .n{outline:none;font-weight:400;text-align:left}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right}
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
+
   @media print{
     @page{size:A4;margin:0}
-    body{background:#fff}header,main>*:not(#sheet),.hint{display:none!important}
+    body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
-    .topband img{height:41.9mm;width:auto}
-    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
-    .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
-    .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}.title{font-size:40px}.day{font-size:28px}.dish{font-size:17px;padding:12px 0}
-  }
-</style>
-</head>
-<body>
-<header><b>KRONE</b><h1>Mittagstisch</h1></header>
-<main>
-  <label for="url">Link della pagina</label>
-  <input id="url" type="url" inputmode="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
-  <label for="day">Giorno</label>
-  <select id="day"></select>
-  <button class="main" id="go">Crea menù</button>
-  <div id="status"></div>
-
-  <div id="sheet">
-    <div class="topband"><img src="logo_t.png" alt=""></div>
-    <div class="inner">
-      <div class="title">Mittagstisch</div>
-      <div class="sub">TAGESGERICHTE</div>
-      <div class="day" id="sheetDay"></div>
-      <div id="dishes"></div>
-    </div>
-    <div class="botband"><img src="foot_t.png" alt=""><div class="flag"><i></i><i></i><i></i></div></div>
-  </div>
-  <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
-  <div class="row" id="actions" style="display:none">
-    <button class="alt" id="word">Scarica Word</button>
-    <button class="alt" id="pdf">Scarica PDF</button>
-  </div>
-
-  <details>
-    <summary>Se non legge il sito: incolla il testo</summary>
-    <p style="font-size:13px;margin:8px 0">Copia dal sito il giorno con i piatti e i prezzi (il nome del giorno su una riga, poi piatto e prezzo, uno per riga) e incollalo qui.</p>
-    <textarea id="paste" rows="8" placeholder="Montag&#10;Pizza mit Schinken und Salami&#10;11&#10;..."></textarea>
-    <button class="main" id="usePaste">Usa il testo incollato</button>
-  </details>
-</main>
-
-<script>
-const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-const PRICE = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
-const FONT = "Quicksand", GREEN = "073334", GOLD = "C9A227";
-
-function parseDay(text, day) {
-  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-  const daysLow = DAYS.map(d => d.toLowerCase());
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].toLowerCase() !== day.toLowerCase()) continue;
-    const dishes = []; let buf = [];
-    for (let j = i + 1; j < lines.length; j++) {
-      const x = lines[j];
-      if (daysLow.includes(x.toLowerCase())) break;
-      const m = x.match(PRICE);
-      if (m) { if (buf.length) dishes.push([buf.slice(-2).join(" "), m[1]]); buf = []; }
-      else { buf.push(x); if (dishes.length && buf.length > 3) break; }
-    }
-    if (dishes.length) return dishes;
-  }
-  return [];
-}
-
-function buildDocx(day, dishes, logoData, footData) {
-  const { Document, Paragraph, TextRun, ImageRun, Header, Footer, Table, TableRow, TableCell, WidthType,
-    BorderStyle, AlignmentType, VerticalAlign, HeightRule, TableLayoutType, ShadingType,
-    TabStopType, LeaderType, Tab, LineRuleType } = docx;
-  const cm = v => Math.round(v / 2.54 * 1440);                       // cm -> twips
-  const px = v => Math.round(v / 200 * 96);                          // pixel a 200 dpi -> pixel a 96 dpi
-  const GREEN_FILL = "073334";
-  const NONE = { style: BorderStyle.NONE, size: 0, color: "auto" };
-  const NOB = { top: NONE, bottom: NONE, left: NONE, right: NONE };
-  const fill = c => ({ type: ShadingType.CLEAR, fill: c, color: "auto" });
-  const BAND_W = cm(21.15), HDR_H = 5.08, FTR_H = 7.7, FLAG_H = 0.28, SIDE = 1.6;
-  const tiny = c => new Paragraph({ spacing: { before: 0, after: 0, line: 1, lineRule: LineRuleType.EXACT },
-    shading: c ? fill(c) : undefined, run: { size: 2 }, children: [] });
-  const img = (data, w, h) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0 },
-    children: [new ImageRun({ type: "png", data, transformation: { width: px(w), height: px(h) } })] });
-
-  const header = new Header({ children: [
-    new Table({ width: { size: BAND_W, type: WidthType.DXA }, columnWidths: [BAND_W], layout: TableLayoutType.FIXED,
-      borders: { ...NOB, insideHorizontal: NONE, insideVertical: NONE }, margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      rows: [new TableRow({ height: { value: cm(HDR_H), rule: HeightRule.EXACT }, children: [
-        new TableCell({ width: { size: BAND_W, type: WidthType.DXA }, shading: fill(GREEN_FILL), borders: NOB,
-          verticalAlign: VerticalAlign.CENTER, children: [img(logoData, 693, 330)] })] })] }),
-    tiny(GREEN_FILL),
-  ] });
-
-  const third = Math.floor(BAND_W / 3);
-  const flagCell = c => new TableCell({ width: { size: third, type: WidthType.DXA }, shading: fill(c), borders: NOB, children: [tiny()] });
-  const footer = new Footer({ children: [
-    new Table({ width: { size: third * 3, type: WidthType.DXA }, columnWidths: [third, third, third], layout: TableLayoutType.FIXED,
-      borders: { ...NOB, insideHorizontal: NONE, insideVertical: NONE }, margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      rows: [
-        new TableRow({ height: { value: cm(FTR_H), rule: HeightRule.EXACT }, children: [
-          new TableCell({ columnSpan: 3, width: { size: third * 3, type: WidthType.DXA }, shading: fill(GREEN_FILL), borders: NOB,
-            verticalAlign: VerticalAlign.CENTER, children: [img(footData, 1100, 581)] })] }),
-        new TableRow({ height: { value: cm(FLAG_H), rule: HeightRule.EXACT },
-          children: [flagCell("295E28"), flagCell("ECE6D5"), flagCell("B60D08")] }),
-      ] }),
-    tiny("B60D08"),
-  ] });
-
-  const indent = { left: cm(SIDE), right: cm(SIDE) };
-  const TEXT_W = cm(21 - 2 * SIDE), PRICE_W = cm(2.6), NAME_W = TEXT_W - PRICE_W;
-  const dishRows = dishes.map(([n, p]) => new TableRow({ cantSplit: true, height: { value: cm(1.05), rule: HeightRule.ATLEAST }, children: [
-    new TableCell({ width: { size: NAME_W, type: WidthType.DXA }, borders: NOB, verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({ children: [new TextRun({ text: n, font: FONT, size: 28, color: "1A1A1A" })] })] }),
-    new TableCell({ width: { size: PRICE_W, type: WidthType.DXA }, borders: NOB, verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({ alignment: AlignmentType.RIGHT,
-        children: [new TextRun({ text: p + " €", font: FONT, size: 28, bold: true, color: GREEN })] })] }),
-  ] }));
-
-  const kids = [
-    new Paragraph({ alignment: AlignmentType.CENTER, indent, spacing: { before: 0, after: 80 },
-      children: [new TextRun({ text: "Mittagstisch", font: FONT, size: 72, bold: true, color: GREEN })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, indent, spacing: { after: 320 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: GOLD, space: 8 } },
-      children: [new TextRun({ text: "TAGESGERICHTE", font: FONT, size: 20, bold: true, color: GOLD, characterSpacing: 80 })] }),
-    new Paragraph({ indent, spacing: { before: 160, after: 160 }, keepNext: true,
-      children: [new TextRun({ text: day, font: FONT, size: 48, bold: true, color: GREEN })] }),
-    new Table({ width: { size: TEXT_W, type: WidthType.DXA }, columnWidths: [NAME_W, PRICE_W], layout: TableLayoutType.FIXED,
-      indent: { size: cm(SIDE), type: WidthType.DXA }, borders: { ...NOB, insideHorizontal: NONE, insideVertical: NONE },
-      margins: { top: 40, bottom: 40, left: 0, right: 0 }, rows: dishRows }),
-  ];
-  return new Document({
-    styles: { default: { document: { run: { font: FONT, size: 26 } } } },
-    sections: [{
-      properties: { page: { size: { width: 11906, height: 16838 },
-        margin: { top: cm(HDR_H + 0.8), bottom: cm(FTR_H + FLAG_H + 0.4), left: 0, right: 0, header: 0, footer: 0 } } },
-      headers: { default: header }, footers: { default: footer }, children: kids,
-    }],
-  });
-}
-
-async function buildPdf(day, dishes, logoBytes, footBytes) {
-  const { PDFDocument, StandardFonts, rgb } = PDFLib;
-  const cmu = 72 / 2.54, W = 595.2756, H = 841.8898;
-  const HDR_H = 5.08, FTR_H = 7.7, FLAG_H = 0.28, SIDE = 1.6;
-  const pdf = await PDFDocument.create();
-  pdf.setTitle("Mittagstisch " + day);
-  const page = pdf.addPage([W, H]);
-  const reg = await pdf.embedFont(StandardFonts.Helvetica);
-  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const C = h => rgb(parseInt(h.slice(0, 2), 16) / 255, parseInt(h.slice(2, 4), 16) / 255, parseInt(h.slice(4, 6), 16) / 255);
-
-  // fascia verde in alto con il logo
-  page.drawRectangle({ x: 0, y: H - HDR_H * cmu, width: W, height: HDR_H * cmu, color: C("073334") });
-  const logo = await pdf.embedPng(logoBytes);
-  const lw = 8.8 * cmu, lh = lw * 330 / 693;
-  page.drawImage(logo, { x: (W - lw) / 2, y: H - HDR_H * cmu + (HDR_H * cmu - lh) / 2, width: lw, height: lh });
-
-  // blocco verde in fondo + disegno + tricolore
-  const footH = (FTR_H + FLAG_H) * cmu;
-  page.drawRectangle({ x: 0, y: 0, width: W, height: footH, color: C("073334") });
-  const foot = await pdf.embedPng(footBytes);
-  const fw = 13.97 * cmu, fh = fw * 581 / 1100;
-  page.drawImage(foot, { x: (W - fw) / 2, y: FLAG_H * cmu + (FTR_H * cmu - fh) / 2, width: fw, height: fh });
-  ["295E28", "ECE6D5", "B60D08"].forEach((c, i) =>
-    page.drawRectangle({ x: i * W / 3, y: 0, width: W / 3 + 0.5, height: FLAG_H * cmu, color: C(c) }));
-
-  // titolo
-  const left = SIDE * cmu, right = W - SIDE * cmu;
-  let y = H - (HDR_H + 0.8) * cmu - 30;
-  const t1 = "Mittagstisch";
-  page.drawText(t1, { x: (W - bold.widthOfTextAtSize(t1, 36)) / 2, y, size: 36, font: bold, color: C("073334") });
-  y -= 27;
-  const sub = "TAGESGERICHTE", track = 2.4;
-  const sw = bold.widthOfTextAtSize(sub, 10) + track * (sub.length - 1);
-  let x = (W - sw) / 2;
-  for (const ch of sub) { page.drawText(ch, { x, y, size: 10, font: bold, color: C("C9A227") }); x += bold.widthOfTextAtSize(ch, 10) + track; }
-  y -= 11;
-  page.drawLine({ start: { x: left, y }, end: { x: right, y }, thickness: 1, color: C("C9A227") });
-  y -= 38;
-  page.drawText(day, { x: left, y, size: 24, font: bold, color: C("073334") });
-
-  // piatti: nome a sinistra, prezzo sempre a destra
-  const avail = y - 14 - (footH + 0.6 * cmu);
-  let size = 14, pitch = 1.05 * cmu;
-  if (dishes.length * pitch > avail) { pitch = Math.max(avail / Math.max(dishes.length, 1), 20); size = pitch < 26 ? 12 : 14; }
-  const nameW = right - left - 2.8 * cmu;
-  const wrap = txt => {
-    const out = []; let cur = "";
-    for (const w of txt.split(/\s+/)) {
-      const t = cur ? cur + " " + w : w;
-      if (reg.widthOfTextAtSize(t, size) <= nameW || !cur) cur = t; else { out.push(cur); cur = w; }
-    }
-    if (cur) out.push(cur);
-    return out;
-  };
-  y -= 14 + 0.5 * pitch;
-  for (const [name, price] of dishes) {
-    const lines = wrap(name), lead = size + 2;
-    const top = y + (lines.length - 1) * lead / 2;
-    lines.forEach((ln, k) => page.drawText(ln, { x: left, y: top - k * lead, size, font: reg, color: C("1A1A1A") }));
-    const ptxt = price + " \u20ac";
-    page.drawText(ptxt, { x: right - bold.widthOfTextAtSize(ptxt, size), y, size, font: bold, color: C("073334") });
-    y -= pitch + (lines.length - 1) * lead;
-  }
-  return await pdf.save();
-}
-
-/* ---------- Interfaccia ---------- */
-if (typeof document !== "undefined") {
-  const $ = id => document.getElementById(id);
-  const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
-  DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
-  $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
-
-  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
-
-  function show(day, dishes) {
-    $("sheetDay").textContent = day;
-    $("dishes").innerHTML = "";
-    dishes.forEach(([n, p]) => {
-      const row = document.createElement("div"); row.className = "dish";
-      row.innerHTML = '<span class="n" contenteditable="true"></span><span class="p" contenteditable="true"></span>';
-      row.querySelector(".n").textContent = n;
-      row.querySelector(".p").textContent = p + " €";
-      $("dishes").appendChild(row);
-    });
-    $("sheet").style.display = "block";
-    $("actions").style.display = "flex";
-    $("hint").style.display = "block";
-    status("Fatto: " + dishes.length + " piatti per " + day + ".");
-    $("sheet").scrollIntoView({ behavior: "smooth" });
-  }
-
-  function current() {
-    const day = $("sheetDay").textContent;
-    const dishes = [...document.querySelectorAll("#dishes .dish")].map(r => [
-      r.querySelector(".n").textContent.trim(),
-      r.querySelector(".p").textContent.replace(/€/g, "").trim(),
-    ]).filter(d => d[0]);
-    return { day, dishes };
-  }
-
-  $("go").onclick = async () => {
-    const day = $("day").value;
-    status("Leggo la pagina…");
-    try {
-      const r = await fetch("/api/menu?url=" + encodeURIComponent($("url").value.trim()));
-      const j = await r.json();
-      if (j.error) throw new Error(j.error);
-      const dishes = parseDay(j.text, day);
-      if (!dishes.length) {
-        status("Non trovo i piatti di " + day + " nel testo della pagina.\nPuò essere che il sito non sia ancora aggiornato, oppure che carichi i testi in modo che questa app non vede. Usa 'incolla il testo' qui sotto, oppure mandami questo testo letto:\n\n" + j.text.slice(0, 1500), true);
-        return;
-      }
-      show(day, dishes);
-    } catch (e) { status("Errore: " + e.message, true); }
-  };
-
-  $("usePaste").onclick = () => {
-    const day = $("day").value;
-    const dishes = parseDay($("paste").value, day);
-    if (!dishes.length) { status("Nel testo incollato non trovo '" + day + "' seguito da piatti e prezzi.", true); return; }
-    show(day, dishes);
-  };
-
-  const load = async u => new Uint8Array(await (await fetch(u)).arrayBuffer());
-  async function save(blob, name) {
-    const file = new File([blob], name, { type: blob.type });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
-    }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  }
-  const stamp = () => new Date().toISOString().slice(0, 10);
-
-  $("pdf").onclick = async () => {
-    try {
-      const { day, dishes } = current();
-      const [lg, ft] = await Promise.all([load("logo_t.png"), load("foot_t.png")]);
-      const bytes = await buildPdf(day, dishes, lg, ft);
-      await save(new Blob([bytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
-    } catch (e) { status("Errore PDF: " + e.message, true); }
-  };
-
-  $("word").onclick = async () => {
-    try {
-      const { day, dishes } = current();
-      const [lg, ft] = await Promise.all([load("logo_t.png"), load("foot_t.png")]);
-      const blob = await docx.Packer.toBlob(buildDocx(day, dishes, lg, ft));
-      await save(blob, "Mittagstisch_" + day + "_" + stamp() + ".docx");
-    } catch (e) { status("Errore Word: " + e.message, true); }
-  };
-}
-</script>
-</body>
-</html>
+    .topband{height:50.8mm;padding:0;display:flex;ali
