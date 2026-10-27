@@ -6,16 +6,18 @@
   <title>👑 Krone Mittagstisch Generator</title>
   <style>
     :root {
-      --gold: #D4AF37;
-      --dark: #2C3E50;
-      --light-bg: #F9F9F9;
-      --border: #E5E7EB;
+      /* I colori ufficiali del brand Krone */
+      --krone-green: #1C352D; /* Il tipico verde scuro del sito */
+      --krone-gold: #D4AF37;  /* Oro per dettagli importanti e prezzi */
+      --krone-text-dark: #2F3E36;
+      --light-bg: #F4F6F4;
+      --border: #E2E8F0;
     }
 
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background-color: #f3f4f6;
-      color: var(--dark);
+      font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      background-color: #EAEFEA;
+      color: var(--krone-text-dark);
       margin: 0;
       padding: 20px;
       display: flex;
@@ -27,67 +29,99 @@
       max-width: 600px;
       width: 100%;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(28, 53, 45, 0.15);
+      box-sizing: border-box;
     }
 
+    /* 🟢 Sezione Superiore Verde */
     .header {
       text-align: center;
-      margin-bottom: 25px;
-      border-bottom: 2px solid var(--gold);
-      padding-bottom: 15px;
+      background-color: var(--krone-green);
+      margin: -30px -30px 25px -30px;
+      padding: 35px 20px;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      border-bottom: 3px solid var(--krone-gold);
+    }
+
+    /* Corona decorativa */
+    .header .crown-icon {
+      font-size: 32px;
+      color: var(--krone-gold);
+      margin-bottom: 5px;
+      display: block;
     }
 
     .header h1 {
       margin: 0;
       font-size: 26px;
-      color: var(--gold);
-      letter-spacing: 1px;
+      color: #FFFFFF;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
     }
 
     .header p {
-      margin: 5px 0 0 0;
-      font-size: 14px;
+      margin: 8px 0 0 0;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      color: #7F8C8D;
+      letter-spacing: 3px;
+      color: var(--krone-gold);
+      font-family: 'Montserrat', sans-serif;
     }
 
     .form-group {
       margin-bottom: 15px;
+      font-family: 'Montserrat', sans-serif;
     }
 
     label {
       display: block;
       font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 14px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--krone-green);
+      letter-spacing: 1px;
     }
 
     input, select {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       box-sizing: border-box;
       font-size: 14px;
+      background-color: #FAFBFB;
+      color: var(--krone-text-dark);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--krone-green);
     }
 
     button {
       width: 100%;
-      padding: 12px;
-      background-color: var(--gold);
+      padding: 14px;
+      background-color: var(--krone-green);
       color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
+      border: 1px solid var(--krone-gold);
+      border-radius: 8px;
+      font-size: 15px;
       font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s;
+      margin-top: 10px;
     }
 
     button:hover {
-      background-color: #C29B30;
+      background-color: #274C40;
+      box-shadow: 0 4px 12px rgba(28, 53, 45, 0.2);
     }
 
     #status {
@@ -95,34 +129,42 @@
       font-style: italic;
       color: #7F8C8D;
       margin: 15px 0;
+      font-size: 14px;
     }
 
-    /* 🍽️ Stile Elegante del Menù Risultato */
+    /* 🍽️ Stile della Cartella del Menù */
     .menu-box {
       margin-top: 30px;
+      border: 1px solid var(--krone-gold);
+      background-color: #FCFDFC;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    /* Contenitore interno dei piatti */
+    .menu-body {
       padding: 25px;
-      border: 1px solid var(--gold);
-      background-color: var(--light-bg);
-      border-radius: 8px;
     }
 
     .menu-day-title {
       text-align: center;
-      font-size: 22px;
-      color: var(--gold);
+      font-size: 24px;
+      color: var(--krone-green);
       margin-top: 0;
       margin-bottom: 20px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: bold;
+      letter-spacing: 2px;
+      border-bottom: 1px solid var(--krone-gold);
+      padding-bottom: 10px;
     }
 
     .dish-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      border-bottom: 1px solid #EEF2EE;
     }
 
     .dish-row:last-child {
@@ -130,26 +172,42 @@
     }
 
     .dish-name {
-      font-weight: bold;
-      font-size: 14px;
+      font-weight: 600;
+      font-size: 15px;
       padding-right: 15px;
-      color: var(--dark);
+      color: var(--krone-text-dark);
+      line-height: 1.4;
     }
 
     .dish-price {
-      font-weight: bold;
-      font-size: 14px;
-      color: var(--gold);
+      font-weight: 700;
+      font-size: 15px;
+      color: #B38F2D; /* Oro scuro visibile su fondo bianco */
       white-space: nowrap;
     }
 
+    /* 🟢 Sezione Inferiore Verde (Footer) */
     .footer-decor {
       text-align: center;
-      margin-top: 25px;
-      font-size: 12px;
-      color: #95A5A6;
-      border-top: 1px dashed var(--gold);
-      padding-top: 15px;
+      background-color: var(--krone-green);
+      padding: 25px 20px;
+      border-top: 3px solid var(--krone-gold);
+      color: #FFFFFF;
+    }
+
+    .footer-decor p {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+    }
+
+    .footer-decor span {
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--krone-gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
   </style>
 </head>
@@ -157,8 +215,9 @@
 
 <div class="container">
   <div class="header">
-    <h1>👑 TRATTORIA PIZZERIA KRONE</h1>
-    <p>Mittagstisch • Menù del Giorno</p>
+    <span class="crown-icon">👑</span>
+    <h1>Trattoria Pizzeria Krone</h1>
+    <p>Mittagstisch • Menù della Settimana</p>
   </div>
 
   <div class="form-group">
@@ -179,38 +238,23 @@
     </select>
   </div>
 
-  <button id="go">Genera Menù Elegante</button>
+  <button id="go">Genera Menù Krone</button>
 
   <div id="status"></div>
 
-  <!-- Il Menù generato apparirà qui -->
+  <!-- Il Menù generato in stile Trattoria Krone -->
   <div id="result-container" style="display: none;">
     <div class="menu-box" id="menu-box">
-      <h2 class="menu-day-title" id="menu-day">MONTAG</h2>
-      <div id="dishes-list"></div>
+      <div class="menu-body">
+        <h2 class="menu-day-title" id="menu-day">MONTAG</h2>
+        <div id="dishes-list"></div>
+      </div>
       <div class="footer-decor">
-        Pizzeria & Trattoria Krone seit 2010 🇮🇹
+        <p>🇮🇹 TRATTORIA PIZZERIA KRONE 🇮🇹</p>
+        <span>Seit 2010 • Buon Appetito</span>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  const \$ = id => document.getElementById(id);
-
-  // Funzione di parsing del testo del menù
-  function parseDay(text, day) {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    let dayIdx = -1;
-
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].toLowerCase().includes(day.toLowerCase())) {
-        dayIdx = i;
-        break;
-      }
-    }
-
-    if (dayIdx === -1) return [];
-
-    const giorni = ["montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag", "sonntag"];
-    let endIdx = 
+<
