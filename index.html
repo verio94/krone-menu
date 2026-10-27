@@ -9,8 +9,9 @@
 <title>Krone Mittagstisch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js"></script>
+<!-- Librerie per esportazione PDF ed Immagine esatta -->
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{--g:#073334;--o:#C9A227}
   *{box-sizing:border-box}
@@ -29,7 +30,9 @@
   #status.err{color:#a02020}
   details{margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #cfc9b6}
   summary{font-weight:700;color:var(--g)}
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden}
+  
+  /* 🖥️ Foglio del Menù (Cosa vedi a schermo) */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
   .topband{background:#073334;padding:14px 0;text-align:center}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
   .botband{background:#073334;margin-top:18px;padding-top:12px}
@@ -40,10 +43,8 @@
   .title{text-align:center;color:var(--g);font-size:34px;font-weight:700;line-height:1.1;margin:0 0 4px}
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
   .day{color:var(--g);font-size:24px;font-weight:700;margin:6px 0 6px}
-  
-  /* 🍽️ Rimozione di qualsiasi tabella visiva nell'anteprima HTML */
-  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px;border-bottom:none}
-  .dish .n{outline:none}
+  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px}
+  .dish .n{outline:none;text-align:left}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right}
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
@@ -74,6 +75,7 @@
   <button class="main" id="go">Crea menù</button>
   <div id="status"></div>
 
+  <!-- Foglio menù visualizzato -->
   <div id="sheet">
     <div class="topband"><img src="logo_t.png" alt=""></div>
     <div class="inner">
@@ -87,9 +89,10 @@
 
   <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
   
+  <!-- Nuovi Bottoni di Esportazione -->
   <div class="row" id="actions" style="display:none">
-    <button class="alt" id="word">Scarica Word</button>
-    <button class="alt" id="pdf">Scarica PDF</button>
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva come PDF</button>
   </div>
 
   <details>
@@ -103,7 +106,7 @@
 <script>
 const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
 const PRICE = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
-const FONT = "Quicksand", GREEN = "073334", GOLD = "C9A227";
+const GREEN = "073334";
 
 function parseDay(text, day) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
@@ -123,72 +126,122 @@ function parseDay(text, day) {
   return [];
 }
 
-function buildDocx(day, dishes, logoData, footData) {
-  const { Document, Paragraph, TextRun, ImageRun, Header, Footer, Table, TableRow, TableCell, WidthType,
-    BorderStyle, AlignmentType, VerticalAlign, HeightRule, TableLayoutType, ShadingType,
-    LineRuleType } = docx;
+if (typeof document !== "undefined") {
+  const $ = id => document.getElementById(id);
+  const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
+  DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
+  $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
+  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
   
-  const cm = v => Math.round(v / 2.54 * 1440);                       // cm -> twips
-  const px = v => Math.round(v / 200 * 96);                          // pixel a 200 dpi -> pixel a 96 dpi
+  function show(day, dishes) {
+    $("sheetDay").textContent = day;
+    $("dishes").innerHTML = "";
+    dishes.forEach(([n, p]) => {
+      const row = document.createElement("div"); row.className = "dish";
+      row.innerHTML = '<span class="n" contenteditable="true"></span><span class="p" contenteditable="true"></span>';
+      row.querySelector(".n").textContent = n;
+      row.querySelector(".p").textContent = p + " €";
+      $("dishes").appendChild(row);
+    });
+    $("sheet").style.display = "block";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+    status("Fatto: " + dishes.length + " piatti per " + day + ".");
+    $("sheet").scrollIntoView({ behavior: "smooth" });
+  }
   
-  // Forza l'esatto colore verde petrolio scuro del sito
-  const GREEN_FILL = "073334";
+  $("go").onclick = async () => {
+    const day = $("day").value;
+    status("Leggo la pagina…");
+    try {
+      const r = await fetch("/api/menu?url=" + encodeURIComponent($("url").value.trim()));
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      const dishes = parseDay(j.text, day);
+      if (!dishes.length) {
+        status("Non trovo i piatti di " + day + " nel testo della pagina.\nPuò essere che il sito non sia ancora aggiornato, oppure che carichi i testi in modo che questa app non vede. Usa 'incolla il testo' qui sotto.\n\n", true);
+        return;
+      }
+      show(day, dishes);
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
   
-  // Bordi impostati esplicitamente a NONE (completamente invisibili)
-  const NONE = { style: BorderStyle.NONE, size: 0, color: "auto" };
-  const NOB = { top: NONE, bottom: NONE, left: NONE, right: NONE };
+  $("usePaste").onclick = () => {
+    const day = $("day").value;
+    const dishes = parseDay($("paste").value, day);
+    if (!dishes.length) { status("Nel testo incollato non trovo '" + day + "' seguito da piatti e prezzi.", true); return; }
+    show(day, dishes);
+  };
   
-  const fill = c => ({ type: ShadingType.CLEAR, fill: c, color: "auto" });
-  const BAND_W = cm(21.15), HDR_H = 5.08, FTR_H = 7.7, FLAG_H = 0.28, SIDE = 1.6;
+  // Funzione universale per salvare i file generati
+  async function saveFile(blob, name) {
+    const file = new File([blob], name, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
   
-  const tiny = c => new Paragraph({ spacing: { before: 0, after: 0, line: 1, lineRule: LineRuleType.EXACT },
-    shading: c ? fill(c) : undefined, run: { size: 2 }, children: [] });
+  const stamp = () => new Date().toISOString().slice(0, 10);
   
-  const img = (data, w, h) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0 },
-    children: [new ImageRun({ type: "png", data, transformation: { width: px(w), height: px(h) } })] });
-  
-  const header = new Header({ children: [
-    new Table({ width: { size: BAND_W, type: WidthType.DXA }, columnWidths: [BAND_W], layout: TableLayoutType.FIXED,
-      borders: NOB, margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      rows: [new TableRow({ height: { value: cm(HDR_H), rule: HeightRule.EXACT }, children: [
-        new TableCell({ width: { size: BAND_W, type: WidthType.DXA }, shading: fill(GREEN_FILL), borders: NOB,
-          verticalAlign: VerticalAlign.CENTER, children: [img(logoData, 693, 330)] })] })] }),
-    tiny(GREEN_FILL),
-  ] });
-  
-  const third = Math.floor(BAND_W / 3);
-  const flagCell = c => new TableCell({ width: { size: third, type: WidthType.DXA }, shading: fill(c), borders: NOB, children: [tiny()] });
-  
-  const footer = new Footer({ children: [
-    new Table({ width: { size: third * 3, type: WidthType.DXA }, columnWidths: [third, third, third], layout: TableLayoutType.FIXED,
-      borders: NOB, margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      rows: [
-        new TableRow({ height: { value: cm(FTR_H), rule: HeightRule.EXACT }, children: [
-          new TableCell({ columnSpan: 3, width: { size: third * 3, type: WidthType.DXA }, shading: fill(GREEN_FILL), borders: NOB,
-            verticalAlign: VerticalAlign.CENTER, children: [img(footData, 1100, 581)] })] }),
-        new TableRow({ height: { value: cm(FLAG_H), rule: HeightRule.EXACT },
-          children: [flagCell("295E28"), flagCell("ECE6D5"), flagCell("B60D08")] }),
-      ] }),
-    tiny("B60D08"),
-  ] });
-  
-  const indent = { left: cm(SIDE), right: cm(SIDE) };
-  const TEXT_W = cm(21 - 2 * SIDE), PRICE_W = cm(2.6), NAME_W = TEXT_W - PRICE_W;
-  
-  // Tabella interna dei piatti con bordi del tutto assenti
-  const dishRows = dishes.map(([n, p]) => new TableRow({ cantSplit: true, height: { value: cm(1.05), rule: HeightRule.ATLEAST }, children: [
-    new TableCell({ width: { size: NAME_W, type: WidthType.DXA }, borders: NOB, verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({ children: [new TextRun({ text: n, font: FONT, size: 28, color: "1A1A1A" })] })] }),
-    new TableCell({ width: { size: PRICE_W, type: WidthType.DXA }, borders: NOB, verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({ alignment: AlignmentType.RIGHT,
-        children: [new TextRun({ text: p + " €", font: FONT, size: 28, bold: true, color: GREEN })] })] }),
-  ] }));
-  
-  const kids = [
-    new Paragraph({ alignment: AlignmentType.CENTER, indent, spacing: { before: 0, after: 80 },
-      children: [new TextRun({ text: "Mittagstisch", font: FONT, size: 72, bold: true, color: GREEN })] }),
-    new Paragraph({ alignment: AlignmentType.CENTER, indent, spacing: { after: 320 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: GOLD, space: 8 } },
-      children: [new TextRun({ text: "TAGESGERICHTE", font: FONT, size: 20, bold: true, color: GOLD, characterSpacing: 80 })] }),
-    new Paragraph({ indent, spacing: { before: 160, after: 160 }, keepNext: true,
-      children: [new TextRun({ text: day, font: FONT, size: 48, bold: tru
+  // 📸 FUNZIONE: Salva esattamente come Immagine PNG (html2canvas)
+  $("photo").onclick = async () => {
+    status("Generazione dell'immagine...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2 // Alta definizione per la stampa o condivisione WhatsApp
+      });
+      canvas.toBlob(async (blob) => {
+        const day = $("sheetDay").textContent;
+        await saveFile(blob, "Mittagstisch_" + day + "_" + stamp() + ".png");
+        status("Immagine salvata con successo!");
+      }, "image/png");
+    } catch (e) {
+      status("Errore generazione Foto: " + e.message, true);
+    }
+  };
+
+  // 📄 FUNZIONE: Salva esattamente come PDF basato sull'immagine dello schermo
+  $("pdf").onclick = async () => {
+    status("Generazione del PDF...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
+      const imgData = canvas.toDataURL("image/png");
+      
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      
+      // Impostiamo la pagina A4 esatta
+      const page = pdfDoc.addPage([595.28, 841.89]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+      
+      // Proporzioni per centrare l'immagine nel foglio A4
+      const pWidth = 595.28 - 40; // 20pt margine destro/sinistro
+      const pHeight = (canvas.height * pWidth) / canvas.width;
+      
+      page.drawImage(pngImage, {
+        x: 20,
+        y: 841.89 - pHeight - 20,
+        width: pWidth,
+        height: pHeight,
+      });
+      
+      const pdfBytes = await pdfDoc.save();
+      const day = $("sheetDay").textContent;
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
+      status("PDF salvato con successo!");
+    } catch (e) {
+      status("Errore generazione PDF: " + e.message, true);
+    }
+  };
+}
+</script>
+</body>
+</html>
