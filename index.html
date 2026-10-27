@@ -21,7 +21,7 @@
   header h1{margin:4px 0 0;font-weight:500;font-size:26px}
   main{max-width:640px;margin:0 auto;padding:14px}
   label{display:block;font-weight:700;color:var(--g);margin:12px 0 4px;font-size:14px}
-  input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #cfc9b6;border-radius:10px;background:#fff;color:#1a1a1a}
+  input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #cfc9b6;border-radius:10px;background:#fff}
   button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 16px;cursor:pointer}
   .main{background:var(--g);color:#fff;width:100%;margin-top:14px;font-size:17px}
   .alt{background:var(--o);color:#1a1a1a}
@@ -31,7 +31,7 @@
   details{margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #cfc9b6}
   summary{font-weight:700;color:var(--g)}
   
-  /* 🖥️ Foglio del Menù (Cosa vedi a schermo, nella foto e nel PDF) */
+  /* 🖥️ Foglio del Menù (Cosa vedi a schermo) */
   #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
   .topband{background:#073334;padding:14px 0;text-align:center}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
@@ -40,16 +40,12 @@
   .flag{display:flex;height:7px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
   .inner{padding:20px 22px 6px}
-  
-  /* ✍️ Scritte Uniformate al Font Quicksand 400 (Esattamente come "Pizza") */
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
-  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
-  
-  /* Piatti senza tabelle o linee visive */
-  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px;font-family:'Quicksand',sans-serif}
-  .dish .n{outline:none;text-align:left;font-weight:400;font-family:'Quicksand',sans-serif}
-  .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right;font-family:'Quicksand',sans-serif}
+  .title{text-align:center;color:var(--g);font-size:34px;font-weight:700;line-height:1.1;margin:0 0 4px}
+  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
+  .day{color:var(--g);font-size:24px;font-weight:700;margin:6px 0 6px}
+  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px}
+  .dish .n{outline:none;text-align:left}
+  .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right}
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
   @media print{
@@ -62,10 +58,7 @@
     .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
     .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
     .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}
-    .title{font-size:40px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .day{font-size:28px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .dish{font-size:17px;padding:12px 0;font-family:'Quicksand',sans-serif}
+    .inner{padding:8mm 16mm 0}.title{font-size:40px}.day{font-size:28px}.dish{font-size:17px;padding:12px 0}
   }
 </style>
 </head>
@@ -96,10 +89,10 @@
 
   <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
   
-  <!-- Nuovi Bottoni di Esportazione originali -->
+  <!-- Nuovi Bottoni di Esportazione -->
   <div class="row" id="actions" style="display:none">
-    <button class="alt" id="photo">Salva</button>
-    <button class="alt" id="pdf">Salva PDF</button>
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva come PDF</button>
   </div>
 
   <details>
@@ -134,24 +127,11 @@ function parseDay(text, day) {
 }
 
 if (typeof document !== "undefined") {
-  const \$ = id => document.getElementById(id);
-  
-  // ⚡ Popolamento corretto e sblocco del drop-down (select) dei giorni
-  const selectDay = $("day");
-  selectDay.innerHTML = ""; // Pulisce elementi residui
+  const $ = id => document.getElementById(id);
   const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
-  
-  DAYS.forEach(d => { 
-    const o = document.createElement("option"); 
-    o.value = d;
-    o.textContent = d; 
-    selectDay.appendChild(o); 
-  });
-  
-  // Imposta il giorno preselezionato basato su oggi
-  selectDay.value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
-  
-  const status = (t, err) => { \$("status").textContent = t; \$("status").className = err ? "err" : ""; };
+  DAYS.forEach(d => { const o = document.createElement("option"); o.textContent = d; $("day").appendChild(o); });
+  $("day").value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
+  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
   
   function show(day, dishes) {
     $("sheetDay").textContent = day;
@@ -193,6 +173,7 @@ if (typeof document !== "undefined") {
     show(day, dishes);
   };
   
+  // Funzione universale per salvare i file generati
   async function saveFile(blob, name) {
     const file = new File([blob], name, { type: blob.type });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -204,16 +185,14 @@ if (typeof document !== "undefined") {
   
   const stamp = () => new Date().toISOString().slice(0, 10);
   
-  // 📸 FUNZIONE: Salva come Foto PNG con Font Corretti integrati
+  // 📸 FUNZIONE: Salva esattamente come Immagine PNG (html2canvas)
   $("photo").onclick = async () => {
     status("Generazione dell'immagine...");
     try {
-      // Forza il browser a completare il caricamento dei font prima dello "scatto"
-      await document.fonts.ready;
       const canvas = await html2canvas($("sheet"), {
         useCORS: true,
         backgroundColor: "#ffffff",
-        scale: 2
+        scale: 2 // Alta definizione per la stampa o condivisione WhatsApp
       });
       canvas.toBlob(async (blob) => {
         const day = $("sheetDay").textContent;
@@ -221,4 +200,48 @@ if (typeof document !== "undefined") {
         status("Immagine salvata con successo!");
       }, "image/png");
     } catch (e) {
-      status("Errore generazione Foto: " + e.message, 
+      status("Errore generazione Foto: " + e.message, true);
+    }
+  };
+
+  // 📄 FUNZIONE: Salva esattamente come PDF basato sull'immagine dello schermo
+  $("pdf").onclick = async () => {
+    status("Generazione del PDF...");
+    try {
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
+      const imgData = canvas.toDataURL("image/png");
+      
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      
+      // Impostiamo la pagina A4 esatta
+      const page = pdfDoc.addPage([595.28, 841.89]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+      
+      // Proporzioni per centrare l'immagine nel foglio A4
+      const pWidth = 595.28 - 40; // 20pt margine destro/sinistro
+      const pHeight = (canvas.height * pWidth) / canvas.width;
+      
+      page.drawImage(pngImage, {
+        x: 20,
+        y: 841.89 - pHeight - 20,
+        width: pWidth,
+        height: pHeight,
+      });
+      
+      const pdfBytes = await pdfDoc.save();
+      const day = $("sheetDay").textContent;
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
+      status("PDF salvato con successo!");
+    } catch (e) {
+      status("Errore generazione PDF: " + e.message, true);
+    }
+  };
+}
+</script>
+</body>
+</html>
