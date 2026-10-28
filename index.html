@@ -74,7 +74,7 @@
   
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
-  /* Classe temporanea applicata solo durante lo scatto del PDF per compattare i testi */
+  /* Impostazioni specifiche per compattare prima dello scatto */
   .pdf-compact .inner { padding: 12px 22px 4px !important; }
   .pdf-compact .title { font-size: 26px !important; margin-bottom: 2px !important; }
   .pdf-compact .sub { padding-bottom: 8px !important; margin-bottom: 8px !important; }
@@ -142,7 +142,7 @@
 
   <div id="status"></div>
 
-  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo -->
+  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo (Contenitore fittizio d'appoggio) -->
   <div id="sheet">
     <div class="topband"><img src="logo_t.png" alt=""></div>
     <div class="inner">
@@ -178,7 +178,7 @@ const CATEGORIES = ["vorspeisen", "hauptgerichte", "getränke", "desserts"];
 
 let selectedMenuType = "mittag"; // "mittag" o "empfehlung"
 
-// 1. PARSER REALE E ORIGINALE PER IL MITTAGSTISCH (Nessuna modifica, infallibile)
+// 1. PARSER REALE E ORIGINALE PER IL MITTAGSTISCH
 function parseMittagstisch(text, day) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const daysLow = DAYS.map(d => d.toLowerCase());
@@ -207,7 +207,7 @@ function extractCleanPrice(line) {
   return match ? (match[1] || match[2]) : null;
 }
 
-// 2. PARSER ISOLATO E MULTIPLICATO PER LA EMPFEHLUNGSKARTE
+// 2. PARSER ISOLATO PER LA EMPFEHLUNGSKARTE
 function parseEmpfehlungskarte(text) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const dishes = [];
@@ -253,7 +253,7 @@ function parseEmpfehlungskarte(text) {
 if (typeof document !== "undefined") {
   const $ = id => document.getElementById(id);
   
-  // Popolamento e ripristino del Dropdown dei Giorni per il pranzo
+  // Inizializzazione dropdown Mittagstisch
   const selectDay = $("dayMittag");
   selectDay.innerHTML = "";
   const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
@@ -266,7 +266,7 @@ if (typeof document !== "undefined") {
 
   const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
 
-  // Navigazione tra le sezioni (Tab) in modo separato
+  // Navigazione Tab
   $("tabMittag").onclick = () => {
     selectedMenuType = "mittag";
     $("tabMittag").classList.add("active");
@@ -291,7 +291,7 @@ if (typeof document !== "undefined") {
     status("");
   };
 
-  // Renders grafici separati per i due modelli di dati
+  // Rendering a schermo
   function renderMittag(day, dishes) {
     $("sheetDay").textContent = day;
     $("dishes").innerHTML = "";
@@ -305,7 +305,7 @@ if (typeof document !== "undefined") {
     $("sheet").style.display = "block";
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
-    status("Generato con successo: " + dishes.length + " piatti per " + day + ".");
+    status("Generato: " + dishes.length + " piatti per " + day + ".");
     $("sheet").scrollIntoView({ behavior: "smooth" });
   }
 
@@ -341,11 +341,11 @@ if (typeof document !== "undefined") {
     $("sheet").style.display = "block";
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
-    status("Generato con successo: " + dishes.length + " piatti speciali caricate.");
+    status("Generato: " + dishes.length + " elementi.");
     $("sheet").scrollIntoView({ behavior: "smooth" });
   }
 
-  // Chiamate API separate per Mittagstisch e Empfehlungskarte
+  // Chiamate API
   $("goMittag").onclick = async () => {
     const day = $("dayMittag").value;
     status("Lettura dei dati Mittagstisch...");
@@ -357,11 +357,11 @@ if (typeof document !== "undefined") {
       
       const dishes = parseMittagstisch(j.text, day);
       if (!dishes.length) {
-        status("Nessun piatto per " + day + " trovato sul sito. Prova con 'incolla il testo'.", true);
+        status("Nessun piatto per " + day + " trovato sul sito.", true);
         return;
       }
       renderMittag(day, dishes);
-    } catch (e) { status("Errore Mittagstisch: " + e.message, true); }
+    } catch (e) { status("Errore: " + e.message, true); }
   };
 
   $("goEmpf").onclick = async () => {
@@ -374,24 +374,23 @@ if (typeof document !== "undefined") {
       
       const dishes = parseEmpfehlungskarte(j.text);
       if (!dishes.length) {
-        status("Nessun piatto speciale trovato sul sito. Prova con 'incolla il testo'.", true);
+        status("Nessun piatto trovato.", true);
         return;
       }
       renderEmpfehlung(dishes);
-    } catch (e) { status("Errore Empfehlungskarte: " + e.message, true); }
+    } catch (e) { status("Errore: " + e.message, true); }
   };
 
-  // Gestione Incolla separata
   $("usePaste").onclick = () => {
     const pasteContent = $("paste").value;
     if (selectedMenuType === "mittag") {
       const day = $("dayMittag").value;
       const dishes = parseMittagstisch(pasteContent, day);
-      if (!dishes.length) { status("Nessun piatto Mittagstisch rilevato nel testo per " + day + ".", true); return; }
+      if (!dishes.length) { status("Nessun piatto Mittagstisch nel testo.", true); return; }
       renderMittag(day, dishes);
     } else {
       const dishes = parseEmpfehlungskarte(pasteContent);
-      if (!dishes.length) { status("Nessun piatto della Empfehlungskarte rilevato nel testo.", true); return; }
+      if (!dishes.length) { status("Nessun piatto speciale nel testo.", true); return; }
       renderEmpfehlung(dishes);
     }
   };
@@ -422,27 +421,14 @@ if (typeof document !== "undefined") {
         await saveFile(blob, titleName + "_" + stamp() + ".png");
         status("Immagine salvata!");
       }, "image/png");
-    } catch (e) { status("Errore generazione Foto: " + e.message, true); }
+    } catch (e) { status("Errore: " + e.message, true); }
   };
 
-  // 📄 FUNZIONE: Salva PDF esatto con adattamento proporzionale
+  // 📄 FUNZIONE: Salva PDF (IMPAGINAZIONE DINAMICA A4 MULTIPAGINA)
   $("pdf").onclick = async () => {
     status("Generazione del PDF...");
     try {
       await document.fonts.ready;
-      
-      const sheet = $("sheet");
-      sheet.classList.add("pdf-compact");
-      
-      const canvas = await html2canvas(sheet, {
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 2
-      });
-      
-      sheet.classList.remove("pdf-compact");
-      
-      const imgData = canvas.toDataURL("image/png");
       
       const { PDFDocument } = PDFLib;
       const pdfDoc = await PDFDocument.create();
@@ -450,35 +436,100 @@ if (typeof document !== "undefined") {
       const a4Width = 595.28;
       const a4Height = 841.89;
       
-      const margin = 20;
-      const maxWidth = a4Width - (margin * 2);
-      const maxHeight = a4Height - (margin * 2);
+      // Seleziona tutti gli elementi da distribuire sulle pagine
+      const titleText = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
+      const subtitleText = selectedMenuType === "mittag" ? "TAGESGERICHTE" : "EMPFEHLUNGEN";
+      const dayText = $("sheetDay").textContent;
       
-      let finalWidth = maxWidth;
-      let finalHeight = (canvas.height * finalWidth) / canvas.width;
+      const elements = Array.from($("dishes").children);
       
-      if (finalHeight > maxHeight) {
-        finalHeight = maxHeight;
-        finalWidth = (canvas.width * finalHeight) / canvas.height;
-      }
+      // Impostiamo la suddivisione logica per pagine (A4)
+      let pagesContent = [[]];
+      let currentPageIdx = 0;
+      let currentHeightEstimate = 0;
       
-      const xPos = (a4Width - finalWidth) / 2;
-      const yPos = (a4Height - finalHeight) / 2;
+      const maxHeightLimit = 420; // Limite altezza per singolo foglio A4 (in pixel di render)
       
-      const page = pdfDoc.addPage([a4Width, a4Height]);
-      const pngImage = await pdfDoc.embedPng(imgData);
-      
-      page.drawImage(pngImage, {
-        x: xPos,
-        y: yPos,
-        width: finalWidth,
-        height: finalHeight,
+      elements.forEach((el) => {
+        let elHeight = el.offsetHeight || 40;
+        if (el.className === "category-title") elHeight += 20; // Spazio extra per i titoli categoria
+        
+        if (currentHeightEstimate + elHeight > maxHeightLimit && pagesContent[currentPageIdx].length > 0) {
+          currentPageIdx++;
+          pagesContent[currentPageIdx] = [];
+          currentHeightEstimate = 0;
+        }
+        
+        pagesContent[currentPageIdx].push(el);
+        currentHeightEstimate += elHeight;
       });
       
+      // Generazione e render di ciascuna pagina A4
+      for (let p = 0; p < pagesContent.length; p++) {
+        const tempContainer = document.createElement("div");
+        tempContainer.style.position = "absolute";
+        tempContainer.style.top = "-9999px";
+        tempContainer.style.left = "-9999px";
+        tempContainer.style.width = "500px";
+        document.body.appendChild(tempContainer);
+        
+        const cloneSheet = $("sheet").cloneNode(true);
+        cloneSheet.style.display = "block";
+        cloneSheet.classList.add("pdf-compact");
+        
+        tempContainer.appendChild(cloneSheet);
+        
+        // Pulisce ed inserisce solo la porzione di piatti corretta per questa pagina
+        const dishesDiv = cloneSheet.querySelector("#dishes");
+        dishesDiv.innerHTML = "";
+        
+        // Mantieni i titoli corretti per pagina
+        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
+        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        cloneSheet.querySelector("#sheetDay").textContent = dayText + (pagesContent.length > 1 ? ` (Pag. ${p + 1}/${pagesContent.length})` : "");
+        
+        pagesContent[p].forEach(el => {
+          dishesDiv.appendChild(el.cloneNode(true));
+        });
+        
+        const canvas = await html2canvas(cloneSheet, {
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scale: 2
+        });
+        
+        tempContainer.remove();
+        
+        const imgData = canvas.toDataURL("image/png");
+        const page = pdfDoc.addPage([a4Width, a4Height]);
+        const pngImage = await pdfDoc.embedPng(imgData);
+        
+        const margin = 20;
+        const maxWidth = a4Width - (margin * 2);
+        const maxHeight = a4Height - (margin * 2);
+        
+        let finalWidth = maxWidth;
+        let finalHeight = (canvas.height * finalWidth) / canvas.width;
+        
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = (canvas.width * finalHeight) / canvas.height;
+        }
+        
+        const xPos = (a4Width - finalWidth) / 2;
+        const yPos = (a4Height - finalHeight) / 2;
+        
+        page.drawImage(pngImage, {
+          x: xPos,
+          y: yPos,
+          width: finalWidth,
+          height: finalHeight,
+        });
+      }
+      
       const pdfBytes = await pdfDoc.save();
-      const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
-      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleName + "_" + stamp() + ".pdf");
-      status("PDF salvato!");
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleText + "_" + stamp() + ".pdf");
+      status("PDF multi-pagina salvato con successo!");
     } catch (e) { status("Errore generazione PDF: " + e.message, true); }
   };
 }
