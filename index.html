@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Mittagstisch">
+<meta name="apple-mobile-web-app-title" content="Krone Menù">
 <meta name="theme-color" content="#073334">
-<title>Krone Mittagstisch</title>
+<title>Krone Menù Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Librerie per esportazione PDF ed Immagine esatta -->
@@ -31,7 +31,22 @@
   details{margin-top:16px;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #cfc9b6}
   summary{font-weight:700;color:var(--g)}
   
-  /* 🖥️ Foglio del Menù */
+  /* Selettore Tab Centrale ed Indipendente */
+  .tab-container{display:flex;gap:10px;margin-bottom:15px}
+  .tab-btn{flex:1;background:#fff;border:2px solid var(--g);color:var(--g);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;font-size:15px}
+  .tab-btn.active{background:var(--g);color:#fff}
+
+  /* Sezioni separate fisicamente */
+  .menu-section{display:none}
+  .menu-section.active{display:block}
+
+  /* Link rapidi */
+  .quick-links{margin:10px 0;background:#fff;border-radius:10px;padding:12px;border:1px solid #cfc9b6}
+  .quick-links p{margin:0 0 6px;font-size:12px;font-weight:700;color:var(--g)}
+  .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
+  .quick-links a:hover{color:var(--o)}
+
+  /* 🖥️ Foglio del Menù (Cosa vedi a schermo) */
   #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
   .topband{background:#073334;padding:14px 0;text-align:center}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
@@ -44,12 +59,19 @@
   /* ✍️ Scritte Uniformate al Font Quicksand 400 (Esattamente come "Pizza") */
   .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{color:var(--g);font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
+  .day{text-align:center;color:var(--g);font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
   /* Piatti senza tabelle o linee visive */
-  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;font-size:16px;font-family:'Quicksand',sans-serif}
-  .dish .n{outline:none;text-align:left;font-weight:400;font-family:'Quicksand',sans-serif}
+  .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
+  .dish-wrapper:last-of-type{border-bottom:none}
+  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
+  .dish .n{outline:none;text-align:left;font-weight:400;font-family:'Quicksand',sans-serif;flex:1}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right;font-family:'Quicksand',sans-serif}
+  .desc{font-size:12px;color:#666;font-style:italic;margin-top:4px;text-align:left;outline:none;font-family:'Quicksand',sans-serif;line-height:1.3}
+  
+  /* Categorie per Empfehlungskarte */
+  .category-title{color:var(--o);font-size:18px;font-weight:700;margin:18px 0 6px 0;border-bottom:1px dashed var(--o);padding-bottom:4px;text-transform:uppercase;font-family:'Quicksand',sans-serif;text-align:center}
+  
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
   /* Classe temporanea applicata solo durante lo scatto del PDF per compattare i testi */
@@ -57,9 +79,12 @@
   .pdf-compact .title { font-size: 26px !important; margin-bottom: 2px !important; }
   .pdf-compact .sub { padding-bottom: 8px !important; margin-bottom: 8px !important; }
   .pdf-compact .day { font-size: 18px !important; margin: 4px 0 !important; }
-  .pdf-compact .dish { padding: 6px 0 !important; font-size: 13px !important; }
+  .pdf-compact .category-title { font-size: 14px !important; margin: 8px 0 4px 0 !important; }
+  .pdf-compact .dish-wrapper { padding: 4px 0 !important; }
+  .pdf-compact .dish { font-size: 13px !important; }
   .pdf-compact .dish .n { font-size: 13px !important; }
   .pdf-compact .dish .p { font-size: 13px !important; }
+  .pdf-compact .desc { font-size: 10px !important; margin-top: 2px !important; }
   .pdf-compact .botband { margin-top: 10px !important; padding-top: 8px !important; }
 
   @media print{
@@ -81,51 +106,80 @@
 </head>
 <body>
 
-<header><b>KRONE</b><h1>Mittagstisch</h1></header>
+<header><b>KRONE</b><h1 id="mainHeaderTitle">Mittagstisch</h1></header>
 <main>
-  <label for="url">Link della pagina</label>
-  <input id="url" type="url" inputmode="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
-  
-  <label for="day">Giorno</label>
-  <select id="day"></select>
-  
-  <button class="main" id="go">Crea menù</button>
+  <!-- Navigazione Tab Assoluta e Isolata -->
+  <label>Seleziona Cosa Vuoi Creare:</label>
+  <div class="tab-container">
+    <button class="tab-btn active" id="tabMittag">1. Mittagstisch</button>
+    <button class="tab-btn" id="tabEmpf">2. Empfehlungskarte</button>
+  </div>
+
+  <div class="quick-links">
+    <p>🔗 Link Rapidi al tuo Sito:</p>
+    <a href="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c" target="_blank">Apri Mittagstisch</a>
+    <a href="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7" target="_blank">Apri Empfehlungskarte</a>
+  </div>
+
+  <!-- 🟢 SEZIONE A: MITTAGSTISCH (COMPLETAMENTE SEPARATA) -->
+  <div id="sectionMittag" class="menu-section active">
+    <label for="urlMittag">Link della pagina pranzo</label>
+    <input id="urlMittag" type="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
+    
+    <label for="dayMittag">Seleziona Giorno della Settimana</label>
+    <select id="dayMittag"></select>
+    
+    <button class="main" id="goMittag">Crea Menù Mittagstisch</button>
+  </div>
+
+  <!-- 🟡 SEZIONE B: EMPFEHLUNGSKARTE (COMPLETAMENTE SEPARATA) -->
+  <div id="sectionEmpf" class="menu-section">
+    <label for="urlEmpf">Link della pagina raccomandazioni</label>
+    <input id="urlEmpf" type="url" value="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7">
+    
+    <button class="main" id="goEmpf">Crea Menù Empfehlungskarte</button>
+  </div>
+
   <div id="status"></div>
 
-  <!-- Foglio menù visualizzato -->
+  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo -->
   <div id="sheet">
     <div class="topband"><img src="logo_t.png" alt=""></div>
     <div class="inner">
-      <div class="title">Mittagstisch</div>
-      <div class="sub">TAGESGERICHTE</div>
+      <div class="title" id="sheetTitle">Mittagstisch</div>
+      <div class="sub" id="sheetSubtitle">TAGESGERICHTE</div>
       <div class="day" id="sheetDay"></div>
       <div id="dishes"></div>
     </div>
     <div class="botband"><img src="foot_t.png" alt=""><div class="flag"><i></i><i></i><i></i></div></div>
   </div>
 
-  <div class="hint" id="hint" style="display:none">Puoi toccare un piatto o un prezzo per correggerlo prima di scaricare.</div>
+  <div class="hint" id="hint" style="display:none">Puoi toccare un piatto, una descrizione o un prezzo per correggerlo prima di salvare.</div>
   
   <!-- Nuovi Bottoni di Esportazione originali -->
   <div class="row" id="actions" style="display:none">
-    <button class="alt" id="photo">Salva</button>
+    <button class="alt" id="photo">Salva come Foto</button>
     <button class="alt" id="pdf">Salva PDF</button>
   </div>
 
-  <details>
+  <!-- Sezione Incolla Manuale -->
+  <details id="manualPasteDetails">
     <summary>Se non legge il sito: incolla il testo</summary>
-    <p style="font-size:13px;margin:8px 0">Copia dal sito il giorno con i piatti e i prezzi (il nome del giorno su una riga, poi piatto e prezzo, uno per riga) e incollalo qui.</p>
-    <textarea id="paste" rows="8" placeholder="Montag&#10;Pizza mit Schinken und Salami&#10;11&#10;..."></textarea>
+    <p style="font-size:13px;margin:8px 0">Copia dal sito il testo e incollalo qui sotto.</p>
+    <textarea id="paste" rows="8" placeholder="Incolla il testo del menù copiato dal sito..."></textarea>
     <button class="main" id="usePaste">Usa il testo incollato</button>
   </details>
 </main>
 
 <script>
 const DAYS = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
-const PRICE = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
-const GREEN = "073334";
+const PRICE_REGEX = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
+const CATEGORIES = ["vorspeisen", "hauptgerichte", "getränke", "desserts"];
 
-function parseDay(text, day) {
+let selectedMenuType = "mittag"; // "mittag" o "empfehlung"
+
+// 1. PARSER REALE E ORIGINALE PER IL MITTAGSTISCH (Nessuna modifica, infallibile)
+function parseMittagstisch(text, day) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const daysLow = DAYS.map(d => d.toLowerCase());
   for (let i = 0; i < lines.length; i++) {
@@ -134,8 +188,11 @@ function parseDay(text, day) {
     for (let j = i + 1; j < lines.length; j++) {
       const x = lines[j];
       if (daysLow.includes(x.toLowerCase())) break;
-      const m = x.match(PRICE);
-      if (m) { if (buf.length) dishes.push([buf.slice(-2).join(" "), m[1]]); buf = []; }
+      const m = x.match(PRICE_REGEX);
+      if (m) { 
+        if (buf.length) dishes.push([buf.slice(-2).join(" "), m[1]]); 
+        buf = []; 
+      }
       else { buf.push(x); if (dishes.length && buf.length > 3) break; }
     }
     if (dishes.length) return dishes;
@@ -143,26 +200,99 @@ function parseDay(text, day) {
   return [];
 }
 
+// Helper per ripulire ed estrarre i prezzi della Empfehlungskarte
+function extractCleanPrice(line) {
+  const cleaned = line.replace(/€/g, "").replace(/EUR/g, "").trim();
+  const match = cleaned.match(/^(\d{1,3}[.,]\d{2})$|^(\d{1,3})$/);
+  return match ? (match[1] || match[2]) : null;
+}
+
+// 2. PARSER ISOLATO E MULTIPLICATO PER LA EMPFEHLUNGSKARTE
+function parseEmpfehlungskarte(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const dishes = [];
+  let currentCategory = "";
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineLow = line.toLowerCase();
+    
+    if (CATEGORIES.includes(lineLow)) {
+      currentCategory = line;
+      continue;
+    }
+    
+    const priceVal = extractCleanPrice(line);
+    if (priceVal) {
+      let name = "";
+      let desc = "";
+      
+      if (i - 1 >= 0) {
+        name = lines[i - 1];
+        if (CATEGORIES.includes(name.toLowerCase())) name = "Specialità dello Chef";
+      }
+      
+      if (i + 1 < lines.length) {
+        const nextLine = lines[i + 1];
+        if (!extractCleanPrice(nextLine) && !CATEGORIES.includes(nextLine.toLowerCase())) {
+          desc = nextLine;
+        }
+      }
+      
+      dishes.push({
+        category: currentCategory || "Empfehlungen",
+        name: name,
+        price: priceVal,
+        desc: desc
+      });
+    }
+  }
+  return dishes;
+}
+
 if (typeof document !== "undefined") {
   const $ = id => document.getElementById(id);
   
-  // Sblocco del drop-down (select) dei giorni
-  const selectDay = $("day");
+  // Popolamento e ripristino del Dropdown dei Giorni per il pranzo
+  const selectDay = $("dayMittag");
   selectDay.innerHTML = "";
   const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
-  
-  DAYS.forEach(d => { 
-    const o = document.createElement("option"); 
-    o.value = d;
-    o.textContent = d; 
-    selectDay.appendChild(o); 
+  DAYS.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d; o.textContent = d;
+    selectDay.appendChild(o);
   });
-  
   selectDay.value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
-  
+
   const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
-  
-  function show(day, dishes) {
+
+  // Navigazione tra le sezioni (Tab) in modo separato
+  $("tabMittag").onclick = () => {
+    selectedMenuType = "mittag";
+    $("tabMittag").classList.add("active");
+    $("tabEmpf").classList.remove("active");
+    $("sectionMittag").classList.add("active");
+    $("sectionEmpf").classList.remove("active");
+    $("mainHeaderTitle").textContent = "Mittagstisch";
+    $("sheetTitle").textContent = "Mittagstisch";
+    $("sheetSubtitle").textContent = "TAGESGERICHTE";
+    status("");
+  };
+
+  $("tabEmpf").onclick = () => {
+    selectedMenuType = "empfehlung";
+    $("tabEmpf").classList.add("active");
+    $("tabMittag").classList.remove("active");
+    $("sectionEmpf").classList.add("active");
+    $("sectionMittag").classList.remove("active");
+    $("mainHeaderTitle").textContent = "Empfehlungskarte";
+    $("sheetTitle").textContent = "Empfehlungskarte";
+    $("sheetSubtitle").textContent = "EMPFEHLUNGEN";
+    status("");
+  };
+
+  // Renders grafici separati per i due modelli di dati
+  function renderMittag(day, dishes) {
     $("sheetDay").textContent = day;
     $("dishes").innerHTML = "";
     dishes.forEach(([n, p]) => {
@@ -175,33 +305,97 @@ if (typeof document !== "undefined") {
     $("sheet").style.display = "block";
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
-    status("Fatto: " + dishes.length + " piatti per " + day + ".");
+    status("Generato con successo: " + dishes.length + " piatti per " + day + ".");
     $("sheet").scrollIntoView({ behavior: "smooth" });
   }
-  
-  $("go").onclick = async () => {
-    const day = $("day").value;
-    status("Leggo la pagina…");
+
+  function renderEmpfehlung(dishes) {
+    $("sheetDay").textContent = "Unsere Empfehlungen";
+    const container = $("dishes");
+    container.innerHTML = "";
+    
+    let lastCat = "";
+    dishes.forEach(dish => {
+      if (dish.category && dish.category !== lastCat) {
+        const catHeader = document.createElement("div");
+        catHeader.className = "category-title";
+        catHeader.textContent = dish.category;
+        container.appendChild(catHeader);
+        lastCat = dish.category;
+      }
+      
+      const wrapper = document.createElement("div");
+      wrapper.className = "dish-wrapper";
+      let descHtml = dish.desc ? `<div class="desc" contenteditable="true">${dish.desc}</div>` : "";
+      
+      wrapper.innerHTML = `
+        <div class="dish">
+          <span class="n" contenteditable="true">${dish.name}</span>
+          <span class="p" contenteditable="true">${dish.price} €</span>
+        </div>
+        ${descHtml}
+      `;
+      container.appendChild(wrapper);
+    });
+    
+    $("sheet").style.display = "block";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+    status("Generato con successo: " + dishes.length + " piatti speciali caricate.");
+    $("sheet").scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Chiamate API separate per Mittagstisch e Empfehlungskarte
+  $("goMittag").onclick = async () => {
+    const day = $("dayMittag").value;
+    status("Lettura dei dati Mittagstisch...");
     try {
-      const r = await fetch("/api/menu?url=" + encodeURIComponent($("url").value.trim()));
+      const targetUrl = $("urlMittag").value.trim();
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
       if (j.error) throw new Error(j.error);
-      const dishes = parseDay(j.text, day);
+      
+      const dishes = parseMittagstisch(j.text, day);
       if (!dishes.length) {
-        status("Non trovo i piatti di " + day + " nel testo della pagina.\nPuò essere che il sito non sia ancora aggiornato, oppure che carichi i testi in modo che questa app non vede. Usa 'incolla il testo' qui sotto.\n\n", true);
+        status("Nessun piatto per " + day + " trovato sul sito. Prova con 'incolla il testo'.", true);
         return;
       }
-      show(day, dishes);
-    } catch (e) { status("Errore: " + e.message, true); }
+      renderMittag(day, dishes);
+    } catch (e) { status("Errore Mittagstisch: " + e.message, true); }
   };
-  
+
+  $("goEmpf").onclick = async () => {
+    status("Lettura dei dati Empfehlungskarte...");
+    try {
+      const targetUrl = $("urlEmpf").value.trim();
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      
+      const dishes = parseEmpfehlungskarte(j.text);
+      if (!dishes.length) {
+        status("Nessun piatto speciale trovato sul sito. Prova con 'incolla il testo'.", true);
+        return;
+      }
+      renderEmpfehlung(dishes);
+    } catch (e) { status("Errore Empfehlungskarte: " + e.message, true); }
+  };
+
+  // Gestione Incolla separata
   $("usePaste").onclick = () => {
-    const day = $("day").value;
-    const dishes = parseDay($("paste").value, day);
-    if (!dishes.length) { status("Nel testo incollato non trovo '" + day + "' seguito da piatti e prezzi.", true); return; }
-    show(day, dishes);
+    const pasteContent = $("paste").value;
+    if (selectedMenuType === "mittag") {
+      const day = $("dayMittag").value;
+      const dishes = parseMittagstisch(pasteContent, day);
+      if (!dishes.length) { status("Nessun piatto Mittagstisch rilevato nel testo per " + day + ".", true); return; }
+      renderMittag(day, dishes);
+    } else {
+      const dishes = parseEmpfehlungskarte(pasteContent);
+      if (!dishes.length) { status("Nessun piatto della Empfehlungskarte rilevato nel testo.", true); return; }
+      renderEmpfehlung(dishes);
+    }
   };
-  
+
   async function saveFile(blob, name) {
     const file = new File([blob], name, { type: blob.type });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -213,7 +407,7 @@ if (typeof document !== "undefined") {
   
   const stamp = () => new Date().toISOString().slice(0, 10);
   
-  // 📸 FUNZIONE: Salva come Foto PNG
+  // 📸 FUNZIONE: Salva Foto
   $("photo").onclick = async () => {
     status("Generazione dell'immagine...");
     try {
@@ -224,22 +418,19 @@ if (typeof document !== "undefined") {
         scale: 2
       });
       canvas.toBlob(async (blob) => {
-        const day = $("sheetDay").textContent;
-        await saveFile(blob, "Mittagstisch_" + day + "_" + stamp() + ".png");
-        status("Immagine salvata con successo!");
+        const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
+        await saveFile(blob, titleName + "_" + stamp() + ".png");
+        status("Immagine salvata!");
       }, "image/png");
-    } catch (e) {
-      status("Errore generazione Foto: " + e.message, true);
-    }
+    } catch (e) { status("Errore generazione Foto: " + e.message, true); }
   };
 
-  // 📄 FUNZIONE: Salva come PDF reale esatto (Compattamento automatico dei font per far entrare tutto in A4)
+  // 📄 FUNZIONE: Salva PDF esatto con adattamento proporzionale
   $("pdf").onclick = async () => {
     status("Generazione del PDF...");
     try {
       await document.fonts.ready;
       
-      // ⚡ 1. Applichiamo la classe di compattamento prima di scattare lo screenshot
       const sheet = $("sheet");
       sheet.classList.add("pdf-compact");
       
@@ -249,7 +440,6 @@ if (typeof document !== "undefined") {
         scale: 2
       });
       
-      // ⚡ 2. Rimuoviamo subito la classe per non rovinare la visualizzazione a schermo dell'utente
       sheet.classList.remove("pdf-compact");
       
       const imgData = canvas.toDataURL("image/png");
@@ -286,12 +476,10 @@ if (typeof document !== "undefined") {
       });
       
       const pdfBytes = await pdfDoc.save();
-      const day = $("sheetDay").textContent;
-      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), "Mittagstisch_" + day + "_" + stamp() + ".pdf");
-      status("PDF salvato con successo!");
-    } catch (e) {
-      status("Errore generazione PDF: " + e.message, true);
-    }
+      const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleName + "_" + stamp() + ".pdf");
+      status("PDF salvato!");
+    } catch (e) { status("Errore generazione PDF: " + e.message, true); }
   };
 }
 </script>
