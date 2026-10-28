@@ -46,61 +46,61 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù (Cosa vedi a schermo) */
+  /* 🖥️ Foglio del Menù (Bande e loghi sensibilmente ridotti) */
   #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
-  .topband{background:#073334;padding:14px 0;text-align:center}
-  .topband img{width:46%;height:auto;display:block;margin:0 auto}
-  .botband{background:#073334;margin-top:18px;padding-top:12px}
-  .botband img{width:68%;height:auto;display:block;margin:0 auto}
-  .flag{display:flex;height:7px}.flag i{flex:1}
+  .topband{background:#073334;padding:8px 0;text-align:center}
+  .topband img{width:32%;height:auto;display:block;margin:0 auto}
+  .botband{background:#073334;margin-top:12px;padding-top:6px}
+  .botband img{width:48%;height:auto;display:block;margin:0 auto}
+  .flag{display:flex;height:5px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
-  .inner{padding:20px 22px 6px}
+  .inner{padding:15px 22px 4px}
   
-  /* ✍️ Scritte Uniformate al Font Quicksand 400 (Esattamente come "Pizza") */
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
-  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{text-align:center;color:var(--g);font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
+  /* ✍️ Scritte Uniformate al Font Quicksand 400 */
+  .title{text-align:center;color:var(--g);font-size:30px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 3px}
+  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:9px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:10px;border-bottom:1px solid var(--o);margin-bottom:10px}
+  .day{text-align:center;color:var(--g);font-size:22px;font-weight:400;font-family:'Quicksand',sans-serif;margin:4px 0 4px}
   
   /* Piatti senza tabelle o linee visive */
-  .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
+  .dish-wrapper{padding:6px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
-  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
+  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:2px 0;font-size:15px;font-family:'Quicksand',sans-serif}
   .dish .n{outline:none;text-align:left;font-weight:400;font-family:'Quicksand',sans-serif;flex:1}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right;font-family:'Quicksand',sans-serif}
-  .desc{font-size:12px;color:#666;font-style:italic;margin-top:4px;text-align:left;outline:none;font-family:'Quicksand',sans-serif;line-height:1.3}
+  .desc{font-size:11px;color:#666;font-style:italic;margin-top:3px;text-align:left;outline:none;font-family:'Quicksand',sans-serif;line-height:1.3}
   
   /* Categorie per Empfehlungskarte */
-  .category-title{color:var(--o);font-size:18px;font-weight:700;margin:18px 0 6px 0;border-bottom:1px dashed var(--o);padding-bottom:4px;text-transform:uppercase;font-family:'Quicksand',sans-serif;text-align:center}
+  .category-title{color:var(--o);font-size:16px;font-weight:700;margin:14px 0 4px 0;border-bottom:1px dashed var(--o);padding-bottom:3px;text-transform:uppercase;font-family:'Quicksand',sans-serif;text-align:center}
   
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
   /* Impostazioni specifiche per compattare prima dello scatto */
-  .pdf-compact .inner { padding: 12px 22px 4px !important; }
-  .pdf-compact .title { font-size: 26px !important; margin-bottom: 2px !important; }
-  .pdf-compact .sub { padding-bottom: 8px !important; margin-bottom: 8px !important; }
-  .pdf-compact .day { font-size: 18px !important; margin: 4px 0 !important; }
-  .pdf-compact .category-title { font-size: 14px !important; margin: 8px 0 4px 0 !important; }
-  .pdf-compact .dish-wrapper { padding: 4px 0 !important; }
-  .pdf-compact .dish { font-size: 13px !important; }
-  .pdf-compact .dish .n { font-size: 13px !important; }
-  .pdf-compact .dish .p { font-size: 13px !important; }
-  .pdf-compact .desc { font-size: 10px !important; margin-top: 2px !important; }
-  .pdf-compact .botband { margin-top: 10px !important; padding-top: 8px !important; }
+  .pdf-compact .inner { padding: 10px 22px 2px !important; }
+  .pdf-compact .title { font-size: 24px !important; margin-bottom: 2px !important; }
+  .pdf-compact .sub { padding-bottom: 6px !important; margin-bottom: 6px !important; }
+  .pdf-compact .day { font-size: 16px !important; margin: 3px 0 !important; }
+  .pdf-compact .category-title { font-size: 13px !important; margin: 6px 0 3px 0 !important; }
+  .pdf-compact .dish-wrapper { padding: 3px 0 !important; }
+  .pdf-compact .dish { font-size: 12px !important; }
+  .pdf-compact .dish .n { font-size: 12px !important; }
+  .pdf-compact .dish .p { font-size: 12px !important; }
+  .pdf-compact .desc { font-size: 9px !important; margin-top: 1px !important; }
+  .pdf-compact .botband { margin-top: 8px !important; padding-top: 4px !important; }
 
   @media print{
     @page{size:A4;margin:0}
     body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
-    .topband img{height:41.9mm;width:auto}
-    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
-    .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
-    .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}
-    .title{font-size:40px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .day{font-size:28px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .dish{font-size:17px;padding:12px 0;font-family:'Quicksand',sans-serif}
+    .topband{height:30mm;padding:0;display:flex;align-items:center;justify-content:center}
+    .topband img{height:22mm;width:auto}
+    .botband{margin-top:auto;height:50mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
+    .botband img{width:90mm;margin-bottom:auto;margin-top:auto}
+    .flag{height:2mm;flex:none}
+    .inner{padding:6mm 16mm 0}
+    .title{font-size:32px;font-weight:400;font-family:'Quicksand',sans-serif}
+    .day{font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif}
+    .dish{font-size:15px;padding:10px 0;font-family:'Quicksand',sans-serif}
   }
 </style>
 </head>
@@ -424,7 +424,7 @@ if (typeof document !== "undefined") {
     } catch (e) { status("Errore: " + e.message, true); }
   };
 
-  // 📄 FUNZIONE: Salva PDF (IMPAGINAZIONE DINAMICA A4 MULTIPAGINA)
+  // 📄 FUNZIONE: Salva PDF (Senza scritte delle pagine, bande verdi e loghi compattati al massimo)
   $("pdf").onclick = async () => {
     status("Generazione del PDF...");
     try {
@@ -436,23 +436,22 @@ if (typeof document !== "undefined") {
       const a4Width = 595.28;
       const a4Height = 841.89;
       
-      // Seleziona tutti gli elementi da distribuire sulle pagine
       const titleText = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
       const subtitleText = selectedMenuType === "mittag" ? "TAGESGERICHTE" : "EMPFEHLUNGEN";
       const dayText = $("sheetDay").textContent;
       
       const elements = Array.from($("dishes").children);
       
-      // Impostiamo la suddivisione logica per pagine (A4)
       let pagesContent = [[]];
       let currentPageIdx = 0;
       let currentHeightEstimate = 0;
       
-      const maxHeightLimit = 420; // Limite altezza per singolo foglio A4 (in pixel di render)
+      // Limite altezza per A4 aumentato grazie ai loghi più piccoli
+      const maxHeightLimit = 460; 
       
       elements.forEach((el) => {
-        let elHeight = el.offsetHeight || 40;
-        if (el.className === "category-title") elHeight += 20; // Spazio extra per i titoli categoria
+        let elHeight = el.offsetHeight || 30;
+        if (el.className === "category-title") elHeight += 15;
         
         if (currentHeightEstimate + elHeight > maxHeightLimit && pagesContent[currentPageIdx].length > 0) {
           currentPageIdx++;
@@ -464,7 +463,6 @@ if (typeof document !== "undefined") {
         currentHeightEstimate += elHeight;
       });
       
-      // Generazione e render di ciascuna pagina A4
       for (let p = 0; p < pagesContent.length; p++) {
         const tempContainer = document.createElement("div");
         tempContainer.style.position = "absolute";
@@ -479,14 +477,13 @@ if (typeof document !== "undefined") {
         
         tempContainer.appendChild(cloneSheet);
         
-        // Pulisce ed inserisce solo la porzione di piatti corretta per questa pagina
         const dishesDiv = cloneSheet.querySelector("#dishes");
         dishesDiv.innerHTML = "";
         
-        // Mantieni i titoli corretti per pagina
+        // Assegna titoli puliti (Senza dicitura "Pagina 1/2" per estetica professionale)
         cloneSheet.querySelector("#sheetTitle").textContent = titleText;
         cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-        cloneSheet.querySelector("#sheetDay").textContent = dayText + (pagesContent.length > 1 ? ` (Pag. ${p + 1}/${pagesContent.length})` : "");
+        cloneSheet.querySelector("#sheetDay").textContent = dayText;
         
         pagesContent[p].forEach(el => {
           dishesDiv.appendChild(el.cloneNode(true));
@@ -529,7 +526,7 @@ if (typeof document !== "undefined") {
       
       const pdfBytes = await pdfDoc.save();
       await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleText + "_" + stamp() + ".pdf");
-      status("PDF multi-pagina salvato con successo!");
+      status("PDF salvato con successo!");
     } catch (e) { status("Errore generazione PDF: " + e.message, true); }
   };
 }
