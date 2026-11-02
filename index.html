@@ -46,66 +46,61 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù - OTTIMIZZATO BIANCO E NERO (Sfondo verde/grigio chiarissimo ecologico) */
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;margin-left:auto;margin-right:auto}
-  
-  /* Sfondo chiaro per le bande in modo che la stampa b/n sia pulita e consumi poco toner */
-  .topband{background:#E6ECE9;padding:18px 0;text-align:center;width:100%;border-bottom:2px solid var(--g)}
-  .topband img{width:46%;height:auto;display:block;margin:0 auto;filter: brightness(0.2); /* Rende il logo ben visibile anche su sfondo chiaro */}
-  .botband{background:#E6ECE9;margin-top:20px;padding-top:16px;width:100%;border-top:2px solid var(--g)}
-  .botband img{width:68%;height:auto;display:block;margin:0 auto;filter: brightness(0.2); /* Rende il disegno ben visibile */}
-  .flag{display:flex;height:7px;width:100%}.flag i{flex:1}
+  /* 🖥️ Foglio del Menù (Bande e loghi sensibilmente ridotti) */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
+  .topband{background:#073334;padding:8px 0;text-align:center}
+  .topband img{width:32%;height:auto;display:block;margin:0 auto}
+  .botband{background:#073334;margin-top:12px;padding-top:6px}
+  .botband img{width:48%;height:auto;display:block;margin:0 auto}
+  .flag{display:flex;height:5px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
-  .inner{padding:25px 35px 8px}
+  .inner{padding:15px 22px 4px}
   
   /* ✍️ Scritte Uniformate al Font Quicksand 400 */
-  .title{text-align:center;color:var(--g);font-size:36px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
-  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
-  .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
+  .title{text-align:center;color:var(--g);font-size:30px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 3px}
+  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:9px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:10px;border-bottom:1px solid var(--o);margin-bottom:10px}
+  .day{text-align:center;color:var(--g);font-size:22px;font-weight:400;font-family:'Quicksand',sans-serif;margin:4px 0 4px}
   
-  /* Piatti */
-  .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
+  /* Piatti senza tabelle o linee visive */
+  .dish-wrapper{padding:6px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
-  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
+  .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:2px 0;font-size:15px;font-family:'Quicksand',sans-serif}
   .dish .n{outline:none;text-align:left;font-weight:400;font-family:'Quicksand',sans-serif;flex:1}
   .dish .p{font-weight:700;color:var(--g);outline:none;white-space:nowrap;text-align:right;font-family:'Quicksand',sans-serif}
-  .desc{font-size:12px;color:#666;font-style:italic;margin-top:4px;text-align:left;outline:none;font-family:'Quicksand',sans-serif;line-height:1.3}
+  .desc{font-size:11px;color:#666;font-style:italic;margin-top:3px;text-align:left;outline:none;font-family:'Quicksand',sans-serif;line-height:1.3}
   
   /* Categorie per Empfehlungskarte */
-  .category-title{color:var(--o);font-size:18px;font-weight:700;margin:18px 0 6px 0;border-bottom:1px dashed var(--o);padding-bottom:4px;text-transform:uppercase;font-family:'Quicksand',sans-serif;text-align:center}
+  .category-title{color:var(--o);font-size:16px;font-weight:700;margin:14px 0 4px 0;border-bottom:1px dashed var(--o);padding-bottom:3px;text-transform:uppercase;font-family:'Quicksand',sans-serif;text-align:center}
   
   .hint{font-size:12px;color:#777;text-align:center;margin-top:8px}
 
-  /* ⚡ Classi specifiche applicate SOLO al PDF della Empfehlungskarte per tenerlo compatto */
-  .empf-pdf-compact .topband { padding: 8px 0 !important; }
-  .empf-pdf-compact .topband img { width: 32% !important; }
-  .empf-pdf-compact .botband { margin-top: 12px !important; padding-top: 6px !important; }
-  .empf-pdf-compact .botband img { width: 48% !important; }
-  .empf-pdf-compact .flag { height: 5px !important; }
-  .empf-pdf-compact .inner { padding: 10px 22px 2px !important; }
-  .empf-pdf-compact .title { font-size: 24px !important; margin-bottom: 2px !important; }
-  .empf-pdf-compact .sub { padding-bottom: 6px !important; margin-bottom: 6px !important; }
-  .empf-pdf-compact .category-title { font-size: 13px !important; margin: 6px 0 3px 0 !important; }
-  .empf-pdf-compact .dish-wrapper { padding: 3px 0 !important; }
-  .empf-pdf-compact .dish { font-size: 12px !important; }
-  .empf-pdf-compact .dish .n { font-size: 12px !important; }
-  .empf-pdf-compact .dish .p { font-size: 12px !important; }
-  .empf-pdf-compact .desc { font-size: 9px !important; margin-top: 1px !important; }
+  /* Impostazioni specifiche per compattare prima dello scatto */
+  .pdf-compact .inner { padding: 10px 22px 2px !important; }
+  .pdf-compact .title { font-size: 24px !important; margin-bottom: 2px !important; }
+  .pdf-compact .sub { padding-bottom: 6px !important; margin-bottom: 6px !important; }
+  .pdf-compact .day { font-size: 16px !important; margin: 3px 0 !important; }
+  .pdf-compact .category-title { font-size: 13px !important; margin: 6px 0 3px 0 !important; }
+  .pdf-compact .dish-wrapper { padding: 3px 0 !important; }
+  .pdf-compact .dish { font-size: 12px !important; }
+  .pdf-compact .dish .n { font-size: 12px !important; }
+  .pdf-compact .dish .p { font-size: 12px !important; }
+  .pdf-compact .desc { font-size: 9px !important; margin-top: 1px !important; }
+  .pdf-compact .botband { margin-top: 8px !important; padding-top: 4px !important; }
 
   @media print{
     @page{size:A4;margin:0}
     body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center;background:#E6ECE9 !important;border-bottom:2px solid #073334 !important}
-    .topband img{height:41.9mm;width:auto;filter: brightness(0.2) !important}
-    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end;background:#E6ECE9 !important;border-top:2px solid #073334 !important}
-    .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto;filter: brightness(0.2) !important}
-    .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}
-    .title{font-size:40px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .day{font-size:28px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .dish{font-size:17px;padding:12px 0;font-family:'Quicksand',sans-serif}
+    .topband{height:30mm;padding:0;display:flex;align-items:center;justify-content:center}
+    .topband img{height:22mm;width:auto}
+    .botband{margin-top:auto;height:50mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
+    .botband img{width:90mm;margin-bottom:auto;margin-top:auto}
+    .flag{height:2mm;flex:none}
+    .inner{padding:6mm 16mm 0}
+    .title{font-size:32px;font-weight:400;font-family:'Quicksand',sans-serif}
+    .day{font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif}
+    .dish{font-size:15px;padding:10px 0;font-family:'Quicksand',sans-serif}
   }
 </style>
 </head>
@@ -126,7 +121,7 @@
     <a href="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7" target="_blank">Apri Empfehlungskarte</a>
   </div>
 
-  <!-- 🟢 SEZIONE A: MITTAGSTISCH -->
+  <!-- 🟢 SEZIONE A: MITTAGSTISCH (COMPLETAMENTE SEPARATA) -->
   <div id="sectionMittag" class="menu-section active">
     <label for="urlMittag">Link della pagina pranzo</label>
     <input id="urlMittag" type="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
@@ -137,7 +132,7 @@
     <button class="main" id="goMittag">Crea Menù Mittagstisch</button>
   </div>
 
-  <!-- 🟡 SEZIONE B: EMPFEHLUNGSKARTE -->
+  <!-- 🟡 SEZIONE B: EMPFEHLUNGSKARTE (COMPLETAMENTE SEPARATA) -->
   <div id="sectionEmpf" class="menu-section">
     <label for="urlEmpf">Link della pagina raccomandazioni</label>
     <input id="urlEmpf" type="url" value="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7">
@@ -147,7 +142,7 @@
 
   <div id="status"></div>
 
-  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo (Adattato a larghezza massima) -->
+  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo (Contenitore fittizio d'appoggio) -->
   <div id="sheet">
     <div class="topband"><img src="logo_t.png" alt=""></div>
     <div class="inner">
@@ -256,7 +251,7 @@ function parseEmpfehlungskarte(text) {
 }
 
 if (typeof document !== "undefined") {
-  const \$ = id => document.getElementById(id);
+  const $ = id => document.getElementById(id);
   
   // Inizializzazione dropdown Mittagstisch
   const selectDay = $("dayMittag");
@@ -269,7 +264,7 @@ if (typeof document !== "undefined") {
   });
   selectDay.value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
 
-  const status = (t, err) => { \$("status").textContent = t; \$("status").className = err ? "err" : ""; };
+  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
 
   // Navigazione Tab
   $("tabMittag").onclick = () => {
@@ -298,7 +293,6 @@ if (typeof document !== "undefined") {
 
   // Rendering a schermo
   function renderMittag(day, dishes) {
-    $("sheetDay").style.display = "block";
     $("sheetDay").textContent = day;
     $("dishes").innerHTML = "";
     dishes.forEach(([n, p]) => {
@@ -312,4 +306,229 @@ if (typeof document !== "undefined") {
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
     status("Generato: " + dishes.length + " piatti per " + day + ".");
-    $("sheet").scrollIntoView({ behavi
+    $("sheet").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function renderEmpfehlung(dishes) {
+    $("sheetDay").textContent = "Unsere Empfehlungen";
+    const container = $("dishes");
+    container.innerHTML = "";
+    
+    let lastCat = "";
+    dishes.forEach(dish => {
+      // ⚡ Rimosso il blocco duplicato del titolo jolly "Empfehlungen" se coincide con l'intestazione principale
+      if (dish.category && dish.category !== lastCat && dish.category.toLowerCase() !== "empfehlungen") {
+        const catHeader = document.createElement("div");
+        catHeader.className = "category-title";
+        catHeader.textContent = dish.category;
+        container.appendChild(catHeader);
+        lastCat = dish.category;
+      }
+      
+      const wrapper = document.createElement("div");
+      wrapper.className = "dish-wrapper";
+      let descHtml = dish.desc ? `<div class="desc" contenteditable="true">${dish.desc}</div>` : "";
+      
+      wrapper.innerHTML = `
+        <div class="dish">
+          <span class="n" contenteditable="true">${dish.name}</span>
+          <span class="p" contenteditable="true">${dish.price} €</span>
+        </div>
+        ${descHtml}
+      `;
+      container.appendChild(wrapper);
+    });
+    
+    $("sheet").style.display = "block";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+    status("Generato: " + dishes.length + " elementi.");
+    $("sheet").scrollIntoView({ behavior: "smooth" });
+  }
+
+  // Chiamate API
+  $("goMittag").onclick = async () => {
+    const day = $("dayMittag").value;
+    status("Lettura dei dati Mittagstisch...");
+    try {
+      const targetUrl = $("urlMittag").value.trim();
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      
+      const dishes = parseMittagstisch(j.text, day);
+      if (!dishes.length) {
+        status("Nessun piatto per " + day + " trovato sul sito.", true);
+        return;
+      }
+      renderMittag(day, dishes);
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
+
+  $("goEmpf").onclick = async () => {
+    status("Lettura dei dati Empfehlungskarte...");
+    try {
+      const targetUrl = $("urlEmpf").value.trim();
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
+      const j = await r.json();
+      if (j.error) throw new Error(j.error);
+      
+      const dishes = parseEmpfehlungskarte(j.text);
+      if (!dishes.length) {
+        status("Nessun piatto trovato.", true);
+        return;
+      }
+      renderEmpfehlung(dishes);
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
+
+  $("usePaste").onclick = () => {
+    const pasteContent = $("paste").value;
+    if (selectedMenuType === "mittag") {
+      const day = $("dayMittag").value;
+      const dishes = parseMittagstisch(pasteContent, day);
+      if (!dishes.length) { status("Nessun piatto Mittagstisch nel testo.", true); return; }
+      renderMittag(day, dishes);
+    } else {
+      const dishes = parseEmpfehlungskarte(pasteContent);
+      if (!dishes.length) { status("Nessun piatto speciale nel testo.", true); return; }
+      renderEmpfehlung(dishes);
+    }
+  };
+
+  async function saveFile(blob, name) {
+    const file = new File([blob], name, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  
+  const stamp = () => new Date().toISOString().slice(0, 10);
+  
+  // 📸 FUNZIONE: Salva Foto
+  $("photo").onclick = async () => {
+    status("Generazione dell'immagine...");
+    try {
+      await document.fonts.ready;
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
+      canvas.toBlob(async (blob) => {
+        const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
+        await saveFile(blob, titleName + "_" + stamp() + ".png");
+        status("Immagine salvata!");
+      }, "image/png");
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
+
+  // 📄 FUNZIONE: Salva PDF (Senza scritte delle pagine, bande verdi e loghi compattati al massimo)
+  $("pdf").onclick = async () => {
+    status("Generazione del PDF...");
+    try {
+      await document.fonts.ready;
+      
+      const { PDFDocument } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      
+      const a4Width = 595.28;
+      const a4Height = 841.89;
+      
+      const titleText = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
+      const subtitleText = selectedMenuType === "mittag" ? "TAGESGERICHTE" : "EMPFEHLUNGEN";
+      const dayText = $("sheetDay").textContent;
+      
+      const elements = Array.from($("dishes").children);
+      
+      let pagesContent = [[]];
+      let currentPageIdx = 0;
+      let currentHeightEstimate = 0;
+      
+      const maxHeightLimit = 460; 
+      
+      elements.forEach((el) => {
+        let elHeight = el.offsetHeight || 30;
+        if (el.className === "category-title") elHeight += 15;
+        
+        if (currentHeightEstimate + elHeight > maxHeightLimit && pagesContent[currentPageIdx].length > 0) {
+          currentPageIdx++;
+          pagesContent[currentPageIdx] = [];
+          currentHeightEstimate = 0;
+        }
+        
+        pagesContent[currentPageIdx].push(el);
+        currentHeightEstimate += elHeight;
+      });
+      
+      for (let p = 0; p < pagesContent.length; p++) {
+        const tempContainer = document.createElement("div");
+        tempContainer.style.position = "absolute";
+        tempContainer.style.top = "-9999px";
+        tempContainer.style.left = "-9999px";
+        tempContainer.style.width = "500px";
+        document.body.appendChild(tempContainer);
+        
+        const cloneSheet = $("sheet").cloneNode(true);
+        cloneSheet.style.display = "block";
+        cloneSheet.classList.add("pdf-compact");
+        
+        tempContainer.appendChild(cloneSheet);
+        
+        const dishesDiv = cloneSheet.querySelector("#dishes");
+        dishesDiv.innerHTML = "";
+        
+        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
+        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        cloneSheet.querySelector("#sheetDay").textContent = dayText;
+        
+        pagesContent[p].forEach(el => {
+          dishesDiv.appendChild(el.cloneNode(true));
+        });
+        
+        const canvas = await html2canvas(cloneSheet, {
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scale: 2
+        });
+        
+        tempContainer.remove();
+        
+        const imgData = canvas.toDataURL("image/png");
+        const page = pdfDoc.addPage([a4Width, a4Height]);
+        const pngImage = await pdfDoc.embedPng(imgData);
+        
+        const margin = 20;
+        const maxWidth = a4Width - (margin * 2);
+        const maxHeight = a4Height - (margin * 2);
+        
+        let finalWidth = maxWidth;
+        let finalHeight = (canvas.height * finalWidth) / canvas.width;
+        
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = (canvas.width * finalHeight) / canvas.height;
+        }
+        
+        const xPos = (a4Width - finalWidth) / 2;
+        const yPos = (a4Height - finalHeight) / 2;
+        
+        page.drawImage(pngImage, {
+          x: xPos,
+          y: yPos,
+          width: finalWidth,
+          height: finalHeight,
+        });
+      }
+      
+      const pdfBytes = await pdfDoc.save();
+      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleText + "_" + stamp() + ".pdf");
+      status("PDF salvato con successo!");
+    } catch (e) { status("Errore: " + e.message, true); }
+  };
+}
+</script>
+</body>
+</html>
