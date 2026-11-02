@@ -16,7 +16,10 @@
   :root{--g:#073334;--o:#C9A227}
   *{box-sizing:border-box}
   body{margin:0;font-family:'Quicksand',system-ui,sans-serif;color:#1a1a1a;background:#f4f1e8}
-  main{max-width:640px;margin:0 auto;padding:20px 14px}
+  header{background:var(--g);color:#fff;padding:18px 16px;text-align:center}
+  header b{color:var(--o);letter-spacing:.2em;font-size:13px}
+  header h1{margin:4px 0 0;font-weight:500;font-size:26px}
+  main{max-width:640px;margin:0 auto;padding:14px}
   label{display:block;font-weight:700;color:var(--g);margin:12px 0 4px;font-size:14px}
   input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #cfc9b6;border-radius:10px;background:#fff;color:#1a1a1a}
   button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 16px;cursor:pointer}
@@ -89,7 +92,7 @@
 
   @media print{
     @page{size:A4;margin:0}
-    body{background:#fff}main>*:not(#sheet),.hint{display:none!important}
+    body{background:#fff}header,main>*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
@@ -106,6 +109,7 @@
 </head>
 <body>
 
+<header><b>KRONE</b><h1 id="mainHeaderTitle">Mittagstisch</h1></header>
 <main>
   <!-- Navigazione Tab Assoluta e Isolata -->
   <label>Seleziona Cosa Vuoi Creare:</label>
@@ -206,7 +210,7 @@ function extractCleanPrice(line) {
   return match ? (match[1] || match[2]) : null;
 }
 
-// 2. PARSER ISOLATO PER LA EMPFEHLUNGSKARTE
+// 2. PARSER TOTALMENTE ISOLATO E PROTETTO PER LA EMPFEHLUNGSKARTE
 function parseEmpfehlungskarte(text) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const dishes = [];
@@ -217,8 +221,10 @@ function parseEmpfehlungskarte(text) {
     const line = lines[i];
     const lineLow = line.toLowerCase();
     
+    // ⚡ BLOCCO DI SICUREZZA ASSOLUTO: Se incontriamo un giorno (es. "Montag"), interrompiamo immediatamente la lettura della Empfehlungskarte!
+    // Questo esclude al 100% tutti i piatti del Mittagstisch dal menù speciale.
     if (daysLow.includes(lineLow)) {
-      continue;
+      break; 
     }
     
     if (CATEGORIES.includes(lineLow)) {
@@ -279,6 +285,7 @@ if (typeof document !== "undefined") {
     $("tabEmpf").classList.remove("active");
     $("sectionMittag").classList.add("active");
     $("sectionEmpf").classList.remove("active");
+    $("mainHeaderTitle").textContent = "Mittagstisch";
     $("sheetTitle").textContent = "Mittagstisch";
     $("sheetSubtitle").textContent = "TAGESGERICHTE";
     status("");
@@ -290,6 +297,7 @@ if (typeof document !== "undefined") {
     $("tabMittag").classList.remove("active");
     $("sectionEmpf").classList.add("active");
     $("sectionMittag").classList.remove("active");
+    $("mainHeaderTitle").textContent = "Empfehlungskarte";
     $("sheetTitle").textContent = "Empfehlungskarte";
     $("sheetSubtitle").textContent = "EMPFEHLUNGEN";
     status("");
