@@ -837,12 +837,11 @@ if(typeof document !== "undefined"){
 
     $("sheetDay").style.display = "none";
 
-    // Nasconde la casetta e lo sfondo colorato a schermo per l'Empfehlungskarte
+    // Mostra la banda inferiore trasparente e nasconde la casetta a schermo
     $("sheetBotBand").style.background = "transparent";
     $("sheetBotImg").style.display = "none";
 
     const container = $("dishes");
-
     container.innerHTML = "";
 
     let lastCat = "";
@@ -856,17 +855,13 @@ if(typeof document !== "undefined"){
       ){
 
         const catHeader = document.createElement("div");
-
         catHeader.className = "category-title";
         catHeader.textContent = dish.category;
-
         container.appendChild(catHeader);
-
         lastCat = dish.category;
       }
 
       const wrapper = document.createElement("div");
-
       wrapper.className = "dish-wrapper";
 
       const descHtml = dish.desc
@@ -892,7 +887,7 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 580; 
+      const availableHeight = 600; 
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
@@ -905,7 +900,6 @@ if(typeof document !== "undefined"){
     });
 
     status("Generato: " + dishes.length + " elementi in una singola pagina.");
-
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
 
@@ -914,13 +908,11 @@ if(typeof document !== "undefined"){
   $("goMittag").onclick = async () => {
 
     const day = $("dayMittag").value;
-
     status("Lettura dei dati Mittagstisch...");
 
     try{
 
       const targetUrl = $("urlMittag").value.trim();
-
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -929,7 +921,6 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(j.text,day);
 
       if(!dishes.length){
-
         status("Nessun piatto per " + day + " trovato sul sito.",true);
         return;
       }
@@ -937,7 +928,6 @@ if(typeof document !== "undefined"){
       renderMittag(day,dishes);
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
@@ -951,7 +941,6 @@ if(typeof document !== "undefined"){
     try{
 
       const targetUrl = $("urlEmpf").value.trim();
-
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -960,7 +949,6 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(j.text);
 
       if(!dishes.length){
-
         status("Nessun piatto trovato.",true);
         return;
       }
@@ -968,7 +956,6 @@ if(typeof document !== "undefined"){
       renderEmpfehlung(dishes);
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
@@ -985,7 +972,6 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(pasteContent,day);
 
       if(!dishes.length){
-
         status("Nessun piatto Mittagstisch nel testo.",true);
         return;
       }
@@ -997,7 +983,6 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(pasteContent);
 
       if(!dishes.length){
-
         status("Nessun piatto speciale nel testo.",true);
         return;
       }
@@ -1010,37 +995,20 @@ if(typeof document !== "undefined"){
 
   async function saveFile(blob,name){
 
-    const file = new File(
-      [blob],
-      name,
-      {type:blob.type}
-    );
+    const file = new File([blob], name, {type:blob.type});
 
-    if(
-      navigator.canShare &&
-      navigator.canShare({files:[file]})
-    ){
-
+    if(navigator.canShare && navigator.canShare({files:[file]})){
       try{
-
-        await navigator.share({
-          files:[file],
-          title:name
-        });
-
+        await navigator.share({files:[file], title:name});
         return;
-
       }catch(e){
-
         if(e.name === "AbortError") return;
       }
     }
 
     const a = document.createElement("a");
-
     a.href = URL.createObjectURL(blob);
     a.download = name;
-
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1058,6 +1026,11 @@ if(typeof document !== "undefined"){
 
       await document.fonts.ready;
 
+      if (selectedMenuType === "empfehlung") {
+        $("sheetBotBand").style.background = "transparent";
+        $("sheetBotImg").style.display = "none";
+      }
+
       const canvas = await html2canvas($("sheet"),{
         useCORS:true,
         backgroundColor:"#ffffff",
@@ -1070,22 +1043,17 @@ if(typeof document !== "undefined"){
           ? "Mittagstisch"
           : "Empfehlungskarte";
 
-        await saveFile(
-          blob,
-          titleName + "_" + stamp() + ".png"
-        );
-
+        await saveFile(blob, titleName + "_" + stamp() + ".png");
         status("Immagine salvata!");
 
       },"image/png");
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
 
-  /* ESPORTAZIONE PDF SENZA CASETTA E SENZA SFONDO VIOLA */
+  /* ESPORTAZIONE PDF PULITA SENZA CASETTA E SENZA SFONDO NELL'EMPFEHLUNGSKARTE */
 
   $("pdf").onclick = async () => {
 
@@ -1115,14 +1083,16 @@ if(typeof document !== "undefined"){
       innerClone.style.transform = originalInner.style.transform;
       innerClone.style.transformOrigin = "top center";
 
-      // Rimuove lo sfondo e cancella del tutto l'immagine della casetta nel clone del PDF
-      const botBandClone = cloneSheet.querySelector("#sheetBotBand");
-      if (botBandClone) {
-        botBandClone.style.background = "transparent";
-      }
-      const botImgClone = cloneSheet.querySelector("#sheetBotImg");
-      if (botImgClone) {
-        botImgClone.remove();
+      // ELIMINAZIONE DEFINITIVA DI CASETTA E SFONDO PER L'EMPFEHLUNGSKARTE NEL PDF
+      if (selectedMenuType === "empfehlung") {
+        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
+        if (botBandClone) {
+          botBandClone.style.background = "transparent";
+        }
+        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
+        if (botImgClone) {
+          botImgClone.remove(); // Rimuove completamente l'elemento immagine dal DOM del clone
+        }
       }
 
       const tempContainer = document.createElement("div");
@@ -1171,7 +1141,6 @@ if(typeof document !== "undefined"){
       status("PDF generato con successo in una sola pagina a piena larghezza!");
 
     }catch(e){
-
       status("Errore: " + e.message, true);
     }
   };
