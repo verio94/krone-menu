@@ -16,10 +16,7 @@
   :root{--g:#073334;--o:#C9A227}
   *{box-sizing:border-box}
   body{margin:0;font-family:'Quicksand',system-ui,sans-serif;color:#1a1a1a;background:#f4f1e8}
-  header{background:var(--g);color:#fff;padding:18px 16px;text-align:center}
-  header b{color:var(--o);letter-spacing:.2em;font-size:13px}
-  header h1{margin:4px 0 0;font-weight:500;font-size:26px}
-  main{max-width:640px;margin:0 auto;padding:14px}
+  main{max-width:640px;margin:0 auto;padding:20px 14px}
   label{display:block;font-weight:700;color:var(--g);margin:12px 0 4px;font-size:14px}
   input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #cfc9b6;border-radius:10px;background:#fff;color:#1a1a1a}
   button{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 16px;cursor:pointer}
@@ -46,13 +43,11 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù - RIMOSSI I LIMITI DI LARGHEZZA PER UN EFFETTO LARGHEZZA INTERA */
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;margin-left:auto;margin-right:auto}
-  
-  /* Loghi e bande verdi larghi e maestosi sul foglio */
-  .topband{background:#073334;padding:18px 0;text-align:center;width:100%}
+  /* 🖥️ Foglio del Menù - LARGHEZZA INTERA CON VERDE AL 50% */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
+  .topband{background:var(--g);padding:18px 0;text-align:center;width:100%}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
-  .botband{background:#073334;margin-top:20px;padding-top:16px;width:100%}
+  .botband{background:var(--g);margin-top:20px;padding-top:16px;width:100%}
   .botband img{width:68%;height:auto;display:block;margin:0 auto}
   .flag{display:flex;height:7px;width:100%}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
@@ -63,7 +58,7 @@
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
   .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
-  /* Piatti */
+  /* Piatti senza tabelle o linee visive */
   .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
@@ -94,7 +89,7 @@
 
   @media print{
     @page{size:A4;margin:0}
-    body{background:#fff}header,main>*:not(#sheet),.hint{display:none!important}
+    body{background:#fff}main>*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
@@ -111,7 +106,6 @@
 </head>
 <body>
 
-<header><b>KRONE</b><h1 id="mainHeaderTitle">Mittagstisch</h1></header>
 <main>
   <!-- Navigazione Tab Assoluta e Isolata -->
   <label>Seleziona Cosa Vuoi Creare:</label>
@@ -212,7 +206,7 @@ function extractCleanPrice(line) {
   return match ? (match[1] || match[2]) : null;
 }
 
-// 2. PARSER SECURO ED ESCLUSIVO PER LA EMPFEHLUNGSKARTE
+// 2. PARSER ISOLATO PER LA EMPFEHLUNGSKARTE
 function parseEmpfehlungskarte(text) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const dishes = [];
@@ -223,7 +217,6 @@ function parseEmpfehlungskarte(text) {
     const line = lines[i];
     const lineLow = line.toLowerCase();
     
-    // ⚡ Filtro protettivo: Se incontra un giorno della Mittagstisch (es. Montag), salta e ignora la riga
     if (daysLow.includes(lineLow)) {
       continue;
     }
@@ -286,7 +279,6 @@ if (typeof document !== "undefined") {
     $("tabEmpf").classList.remove("active");
     $("sectionMittag").classList.add("active");
     $("sectionEmpf").classList.remove("active");
-    $("mainHeaderTitle").textContent = "Mittagstisch";
     $("sheetTitle").textContent = "Mittagstisch";
     $("sheetSubtitle").textContent = "TAGESGERICHTE";
     status("");
@@ -298,7 +290,6 @@ if (typeof document !== "undefined") {
     $("tabMittag").classList.remove("active");
     $("sectionEmpf").classList.add("active");
     $("sectionMittag").classList.remove("active");
-    $("mainHeaderTitle").textContent = "Empfehlungskarte";
     $("sheetTitle").textContent = "Empfehlungskarte";
     $("sheetSubtitle").textContent = "EMPFEHLUNGEN";
     status("");
