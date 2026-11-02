@@ -61,7 +61,7 @@
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
   .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
-  /* Piatti senza tabelle o linee visive */
+  /* Piatti */
   .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
@@ -210,20 +210,17 @@ function extractCleanPrice(line) {
   return match ? (match[1] || match[2]) : null;
 }
 
-// 2. PARSER SECURO ED ESCLUSIVO PER LA EMPFEHLUNGSKARTE
+// 2. PARSER ISOLATO PER LA EMPFEHLUNGSKARTE
 function parseEmpfehlungskarte(text) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const dishes = [];
   let currentCategory = "";
-  
-  // Lista dei giorni in minuscolo per escluderli al 100% dal parse delle raccomandazioni
   const daysLow = DAYS.map(d => d.toLowerCase());
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lineLow = line.toLowerCase();
     
-    // ⚡ Filtro protettivo: Se incontra un giorno del Mittagstisch (es. "Montag"), lo ignora e salta
     if (daysLow.includes(lineLow)) {
       continue;
     }
@@ -240,7 +237,6 @@ function parseEmpfehlungskarte(text) {
       
       if (i - 1 >= 0) {
         name = lines[i - 1];
-        // Non permette diciture non correlate
         if (CATEGORIES.includes(name.toLowerCase()) || daysLow.includes(name.toLowerCase())) {
           name = "Specialità dello Chef";
         }
@@ -399,20 +395,4 @@ if (typeof document !== "undefined") {
   $("usePaste").onclick = () => {
     const pasteContent = $("paste").value;
     if (selectedMenuType === "mittag") {
-      const day = $("dayMittag").value;
-      const dishes = parseMittagstisch(pasteContent, day);
-      if (!dishes.length) { status("Nessun piatto Mittagstisch nel testo.", true); return; }
-      renderMittag(day, dishes);
-    } else {
-      const dishes = parseEmpfehlungskarte(pasteContent);
-      if (!dishes.length) { status("Nessun piatto speciale nel testo.", true); return; }
-      renderEmpfehlung(dishes);
-    }
-  };
-
-  async function saveFile(blob, name) {
-    const file = new File([blob], name, { type: blob.type });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
-    }
-    const a = document.
+      const day = $("dayMit
