@@ -226,11 +226,21 @@ summary{
 }
 
 .botband{
-  background:transparent;
+  background:var(--gband);
   margin-top:auto;
-  padding-top:0;
+  padding-top:12px;
   width:100%;
   flex-shrink:0;
+}
+
+.botband img{
+  width:60%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+  filter:brightness(0) saturate(100%)
+         invert(35%) sepia(76%) saturate(600%)
+         hue-rotate(8deg) brightness(85%) contrast(95%);
 }
 
 .flag{
@@ -429,7 +439,7 @@ summary{
     margin-top:auto;
     height:auto;
     padding-top:0;
-    background:transparent!important;
+    background:var(--gband)!important;
     flex-shrink:0;
   }
 
@@ -505,7 +515,8 @@ summary{
 
     </div>
 
-    <div class="botband">
+    <div class="botband" id="sheetBotBand">
+      <img src="foot_t.png" alt="" id="sheetBotImg">
       <div class="flag">
         <i></i><i></i><i></i>
       </div>
@@ -791,6 +802,10 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     inner.style.transformOrigin = "top center";
 
+    // Mostra la banda inferiore completa per il Mittagstisch
+    $("sheetBotBand").style.background = "";
+    $("sheetBotImg").style.display = "block";
+
     $("dishes").innerHTML = "";
 
     dishes.forEach(([n,p]) => {
@@ -822,6 +837,10 @@ if(typeof document !== "undefined"){
   function renderEmpfehlung(dishes){
 
     $("sheetDay").style.display = "none";
+
+    // Per l'Empfehlungskarte rimuoviamo la casetta e lo sfondo celestino anche a schermo
+    $("sheetBotBand").style.background = "transparent";
+    $("sheetBotImg").style.display = "none";
 
     const container = $("dishes");
 
@@ -875,7 +894,7 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 560; // Spazio verticale utile all'interno del foglio
+      const availableHeight = 620; // Spazio verticale utile ampliato senza casetta
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
@@ -1068,7 +1087,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF: SEMPRE ESATTAMENTE UNA SOLA PAGINA */
+  /* ESPORTAZIONE PDF: PAGINA UNICA SENZA CASETTA PER L'EMPFEHLUNGSKARTE */
 
   $("pdf").onclick = async () => {
 
@@ -1093,6 +1112,19 @@ if(typeof document !== "undefined"){
       cloneSheet.style.margin = "0";
       cloneSheet.style.boxShadow = "none";
 
+      // Se è Empfehlungskarte rimuoviamo la casetta e lo sfondo celestino dal PDF clonato
+      if (selectedMenuType === "empfehlung") {
+        const innerClone = cloneSheet.querySelector("#sheetInner");
+        const originalInner = $("sheetInner");
+        innerClone.style.transform = originalInner.style.transform;
+        innerClone.style.transformOrigin = "top center";
+
+        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
+        botBandClone.style.background = "transparent";
+        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
+        if (botImgClone) botImgClone.style.display = "none";
+      }
+
       const tempContainer = document.createElement("div");
       tempContainer.style.position = "absolute";
       tempContainer.style.top = "-9999px";
@@ -1101,14 +1133,6 @@ if(typeof document !== "undefined"){
       document.body.appendChild(tempContainer);
 
       tempContainer.appendChild(cloneSheet);
-
-      // Se è Empfehlungskarte applichiamo lo stesso fattore di scala proporzionale calcolato a video
-      if (selectedMenuType === "empfehlung") {
-        const innerClone = cloneSheet.querySelector("#sheetInner");
-        const originalInner = $("sheetInner");
-        innerClone.style.transform = originalInner.style.transform;
-        innerClone.style.transformOrigin = "top center";
-      }
 
       await new Promise(resolve => requestAnimationFrame(resolve));
 
