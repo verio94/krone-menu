@@ -211,19 +211,19 @@ summary{
 
 .topband{
   background:var(--gband);
-  padding:13px 0;
+  padding:14px 0;
   text-align:center;
   width:100%;
   flex-shrink:0;
 }
 
 .topband img{
-  width:43%;
+  width:45%;
   height:auto;
   display:block;
   margin:0 auto;
-  /* Stesso filtro oro identico alla visualizzazione normale del sito */
-  filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(542%) hue-rotate(5deg) brightness(95%) contrast(88%);
+  /* Logo pulito e nativo senza filtri alteranti */
+  filter: none !important;
 }
 
 .botband{
@@ -347,15 +347,15 @@ summary{
   line-height:1.35;
 }
 
-/* CATEGORIE CON SPAZIATURA MAGGIORE */
+/* CATEGORIE CON SPAZIATURA MAGGIORE E PULITA */
 
 .category-title{
   color:var(--darkgold);
   font-size:15px;
   font-weight:700;
-  margin:18px 0 8px; /* Spaziaturà leggermente aumentata per pulizia visiva */
+  margin:24px 0 10px; /* Spaziatura ben calibrata: né troppo stretta né esagerata */
   border-bottom:1px dashed var(--o);
-  padding-bottom:5px;
+  padding-bottom:6px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
@@ -377,7 +377,7 @@ summary{
 
 .empf-pdf-compact .topband img{
   width:32% !important;
-  filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(542%) hue-rotate(5deg) brightness(95%) contrast(88%) !important;
+  filter: none !important;
 }
 
 .empf-pdf-compact .inner{
@@ -396,8 +396,8 @@ summary{
 
 .empf-pdf-compact .category-title{
   font-size:13.5px !important;
-  margin:14px 0 6px !important; /* Spaziatura ottimizzata anche in versione PDF compatto */
-  padding-bottom:3px !important;
+  margin:18px 0 8px !important; /* Spaziatura ottimizzata anche in versione PDF compatto */
+  padding-bottom:4px !important;
 }
 
 .empf-pdf-compact .dish-wrapper{
@@ -530,7 +530,7 @@ summary{
 
   .category-title{
     font-size:15px;
-    margin:15px 0 6px;
+    margin:20px 0 8px;
   }
 
   .botband{
