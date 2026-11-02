@@ -379,6 +379,20 @@ summary{
   margin-top:8px;
 }
 
+/* PDF Empfehlungskarte: layout compatto per stare in una pagina A4 */
+
+.empf-pdf-compact .topband{padding:8px 0 !important}
+.empf-pdf-compact .topband img{width:32% !important}
+.empf-pdf-compact .inner{padding:10px 22px 2px !important}
+.empf-pdf-compact .title{font-size:24px !important;margin-bottom:2px !important}
+.empf-pdf-compact .sub{padding-bottom:6px !important;margin-bottom:6px !important}
+.empf-pdf-compact .category-title{font-size:13px !important;margin:6px 0 3px 0 !important}
+.empf-pdf-compact .dish-wrapper{padding:3px 0 !important}
+.empf-pdf-compact .dish,
+.empf-pdf-compact .dish .n,
+.empf-pdf-compact .dish .p{font-size:12px !important}
+.empf-pdf-compact .desc{font-size:9px !important;margin-top:1px !important}
+
 /* STAMPA A4 */
 
 @media print{
@@ -1109,7 +1123,7 @@ if(typeof document !== "undefined"){
 
   $("pdf").onclick = async () => {
 
-    status("Generazione del PDF in pagina unica...");
+    status("Generazione del PDF...");
 
     try{
 
@@ -1122,102 +1136,157 @@ if(typeof document !== "undefined"){
       const a4Height = 841.89;
 
       const SHEET_W = 500;
-      const SHEET_H = Math.round(SHEET_W * a4Height / a4Width); // proporzioni A4 esatte
+      const SHEET_H = Math.round(SHEET_W * a4Height / a4Width);
 
-      const cloneSheet = $("sheet").cloneNode(true);
-      cloneSheet.style.display = "flex";
-      cloneSheet.style.flexDirection = "column";
-      cloneSheet.style.width = SHEET_W + "px";
-      cloneSheet.style.maxWidth = "none";
-      cloneSheet.style.minHeight = SHEET_H + "px";
-      cloneSheet.style.height = SHEET_H + "px";
-      cloneSheet.style.margin = "0";
-      cloneSheet.style.borderRadius = "0";
-      cloneSheet.style.boxShadow = "none";
+      const isMittag = selectedMenuType === "mittag";
+      const titleText = isMittag ? "Mittagstisch" : "Empfehlungskarte";
+      const subtitleText = isMittag ? "TAGESGERICHTE" : "EMPFEHLUNGEN";
+      const dayText = $("sheetDay").textContent;
 
-      const innerClone = cloneSheet.querySelector("#sheetInner");
-      innerClone.style.transform = "none";
+      const elements = Array.from($("dishes").children);
 
-      // Empfehlungskarte: via banda colorata e casetta, resta solo la bandiera
-      if(selectedMenuType === "empfehlung"){
+      // Empfehlungskarte: sempre una sola pagina. Mittagstisch: divide solo se troppo lungo
+      let pagesContent = [[]];
 
-        cloneSheet.classList.add("empf");
+      if(isMittag){
 
-        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
-        if(botBandClone){
-          botBandClone.style.background = "transparent";
-          botBandClone.style.paddingTop = "0";
-        }
+        let idx = 0;
+        let h = 0;
 
-        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
-        if(botImgClone){
-          botImgClone.remove();
-        }
+        elements.forEach(el => {
+
+          const elH = el.offsetHeight || 30;
+
+          if(h + elH > 620 && pagesContent[idx].length > 0){
+            idx++;
+            pagesContent[idx] = [];
+            h = 0;
+          }
+
+          pagesContent[idx].push(el);
+          h += elH;
+        });
+
+      }else{
+        pagesContent = [elements];
       }
 
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "fixed";
-      tempContainer.style.top = "0";
-      tempContainer.style.left = "0";
-      tempContainer.style.width = SHEET_W + "px";
-      tempContainer.style.zIndex = "-1";
-      tempContainer.style.pointerEvents = "none";
-      document.body.appendChild(tempContainer);
+      for(let p=0;p<pagesContent.length;p++){
 
-      tempContainer.appendChild(cloneSheet);
+        const tempContainer = document.createElement("div");
+        tempContainer.style.position = "absolute";
+        tempContainer.style.top = "-9999px";
+        tempContainer.style.left = "-9999px";
+        tempContainer.style.width = SHEET_W + "px";
+        document.body.appendChild(tempContainer);
 
-      await new Promise(resolve => requestAnimationFrame(resolve));
+        const cloneSheet = $("sheet").cloneNode(true);
+        cloneSheet.style.display = "flex";
+        cloneSheet.style.flexDirection = "column";
+        cloneSheet.style.width = SHEET_W + "px";
+        cloneSheet.style.maxWidth = "none";
+        cloneSheet.style.minHeight = SHEET_H + "px";
+        cloneSheet.style.height = "auto";
+        cloneSheet.style.margin = "0";
+        cloneSheet.style.borderRadius = "0";
+        cloneSheet.style.boxShadow = "none";
 
-      // Se il contenuto è più alto dello spazio disponibile, lo riduco
-      // ma allargo il box così occupa comunque tutta la larghezza
-      const need = innerClone.scrollHeight;
-      const have = innerClone.clientHeight;
+        if(!isMittag){
 
-      if(need > have){
-        const s = have / need;
-        innerClone.style.width = (100 / s) + "%";
-        innerClone.style.transformOrigin = "top left";
-        innerClone.style.transform = "scale(" + s + ")";
+          cloneSheet.classList.add("empf");
+          cloneSheet.classList.add("empf-pdf-compact");
+
+          // via la casetta: resta solo la bandiera
+          const botImg = cloneSheet.querySelector("#sheetBotImg");
+          if(botImg) botImg.remove();
+        }
+
+        tempContainer.appendChild(cloneSheet);
+
+        const innerClone = cloneSheet.querySelector("#sheetInner");
+        innerClone.style.transform = "none";
+
+        const dishesDiv = cloneSheet.querySelector("#dishes");
+        dishesDiv.innerHTML = "";
+
+        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
+        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+
+        const dayEl = cloneSheet.querySelector("#sheetDay");
+
+        if(isMittag){
+          dayEl.style.display = "block";
+          dayEl.textContent = dayText;
+        }else{
+          dayEl.style.display = "none";
+        }
+
+        pagesContent[p].forEach(el => {
+          dishesDiv.appendChild(el.cloneNode(true));
+        });
+
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        // Se il foglio è più alto di un A4, riduco il contenuto
+        // allargando il box, così resta a tutta larghezza
+        const over = cloneSheet.offsetHeight - SHEET_H;
+
+        if(over > 0){
+
+          const ih = innerClone.offsetHeight;
+          const target = ih - over;
+
+          if(target > 50){
+
+            const s = target / ih;
+
+            innerClone.style.flex = "none";
+            innerClone.style.height = target + "px";
+            innerClone.style.width = (100 / s) + "%";
+            innerClone.style.transformOrigin = "top left";
+            innerClone.style.transform = "scale(" + s + ")";
+          }
+        }
+
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const canvas = await html2canvas(cloneSheet, {
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scale: 3
+        });
+
+        tempContainer.remove();
+
+        const imgData = canvas.toDataURL("image/png");
+        const page = pdfDoc.addPage([a4Width, a4Height]);
+        const pngImage = await pdfDoc.embedPng(imgData);
+
+        // Riempie tutta la larghezza; se per caso è più alto, si adatta in altezza
+        let finalWidth = a4Width;
+        let finalHeight = canvas.height * finalWidth / canvas.width;
+
+        if(finalHeight > a4Height){
+          finalHeight = a4Height;
+          finalWidth = canvas.width * finalHeight / canvas.height;
+        }
+
+        page.drawImage(pngImage, {
+          x: (a4Width - finalWidth) / 2,
+          y: (a4Height - finalHeight) / 2,
+          width: finalWidth,
+          height: finalHeight
+        });
       }
-
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      const canvas = await html2canvas(cloneSheet, {
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 3,
-        width: SHEET_W,
-        height: SHEET_H,
-        windowWidth: SHEET_W,
-        windowHeight: SHEET_H,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0
-      });
-
-      tempContainer.remove();
-
-      const imgData = canvas.toDataURL("image/png");
-      const page = pdfDoc.addPage([a4Width, a4Height]);
-      const pngImage = await pdfDoc.embedPng(imgData);
-
-      // Il foglio ha già le proporzioni A4: riempie tutta la pagina
-      page.drawImage(pngImage, {
-        x: 0,
-        y: 0,
-        width: a4Width,
-        height: a4Height
-      });
 
       const pdfBytes = await pdfDoc.save();
 
       await saveFile(
         new Blob([pdfBytes], {type: "application/pdf"}),
-        (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
+        titleText + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo in una sola pagina a piena larghezza!");
+      status("PDF salvato con successo!");
 
     }catch(e){
 
