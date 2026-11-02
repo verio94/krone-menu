@@ -58,9 +58,9 @@ header h1{
 }
 
 main{
-  max-width:760px;
+  max-width:640px;
   margin:0 auto;
-  padding:20px 10px;
+  padding:20px 14px;
 }
 
 label{
@@ -192,33 +192,33 @@ summary{
 
 .quick-links a:hover{color:var(--o)}
 
-/* FOGLIO MENU - LARGHEZZA PIENA A4 */
+/* FOGLIO MENU - LARGHEZZA STRUTTURALE ORIGINALE */
 
 #sheet{
   display:none;
   flex-direction:column;
-  min-height:860px;
+  min-height:720px;
   background:#fff;
   margin-top:16px;
-  border-radius:0;
+  border-radius:6px;
   box-shadow:0 2px 10px #0002;
   overflow:hidden;
   width:100%;
-  max-width:100%; /* Sfrutta il 100% della larghezza disponibile */
+  max-width:500px;
   margin-left:auto;
   margin-right:auto;
 }
 
 .topband{
   background:var(--gband);
-  padding:22px 0;
+  padding:14px 0;
   text-align:center;
   width:100%;
   flex-shrink:0;
 }
 
 .topband img{
-  width:42%;
+  width:45%;
   height:auto;
   display:block;
   margin:0 auto;
@@ -228,13 +228,13 @@ summary{
 .botband{
   background:var(--gband);
   margin-top:auto;
-  padding-top:14px;
+  padding-top:12px;
   width:100%;
   flex-shrink:0;
 }
 
 .botband img{
-  width:45%;
+  width:60%;
   height:auto;
   display:block;
   margin:0 auto;
@@ -245,7 +245,7 @@ summary{
 
 .flag{
   display:flex;
-  height:8px;
+  height:7px;
   width:100%;
 }
 
@@ -254,19 +254,18 @@ summary{
 .flag i:nth-child(2){background:#ECE6D5}
 .flag i:nth-child(3){background:#B60D08}
 
-/* AREA TESTO ESTESA */
+/* AREA TESTO */
 
 .inner{
-  padding:20px 50px 12px; /* Margini laterali ampi per sfruttare tutto il foglio */
+  padding:19px 30px 10px;
   flex:1;
   min-height:0;
-  width: 100%;
 }
 
 .title{
   text-align:center;
   color:var(--g);
-  font-size:38px;
+  font-size:32px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
   line-height:1.15;
@@ -277,18 +276,18 @@ summary{
   text-align:center;
   color:var(--o);
   letter-spacing:.3em;
-  font-size:12px;
+  font-size:11px;
   font-weight:700;
   font-family:'Quicksand',sans-serif;
-  padding-bottom:12px;
+  padding-bottom:11px;
   border-bottom:1px solid var(--o);
-  margin-bottom:14px;
+  margin-bottom:12px;
 }
 
 .day{
   text-align:center;
   color:var(--g);
-  font-size:26px;
+  font-size:23px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
   margin:5px 0 7px;
@@ -297,9 +296,8 @@ summary{
 /* PIATTI */
 
 .dish-wrapper{
-  padding:6px 0;
+  padding:5px 0;
   border-bottom:1px solid #e8e8e8;
-  width: 100%;
 }
 
 .dish-wrapper:last-of-type{
@@ -310,12 +308,11 @@ summary{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  gap:20px;
-  padding:3px 0;
-  font-size:15px;
+  gap:12px;
+  padding:2px 0;
+  font-size:14px;
   line-height:1.4;
   font-family:'Quicksand',sans-serif;
-  width: 100%;
 }
 
 .dish .n{
@@ -339,7 +336,7 @@ summary{
 }
 
 .desc{
-  font-size:11.5px;
+  font-size:10.5px;
   color:#666;
   font-style:italic;
   margin-top:2px;
@@ -347,23 +344,21 @@ summary{
   outline:none;
   font-family:'Quicksand',sans-serif;
   line-height:1.35;
-  width: 100%;
 }
 
 /* CATEGORIE */
 
 .category-title{
   color:var(--darkgold);
-  font-size:16px;
+  font-size:15px;
   font-weight:700;
-  margin:16px 0 8px;
+  margin:14px 0 6px;
   border-bottom:1px dashed var(--o);
-  padding-bottom:5px;
+  padding-bottom:4px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
   line-height:1.2;
-  width: 100%;
 }
 
 .hint{
@@ -437,7 +432,7 @@ summary{
   .inner{
     flex:1;
     min-height:0;
-    padding:8mm 20mm 6mm;
+    padding:5mm 15mm 2mm;
   }
 
   .botband{
@@ -449,7 +444,7 @@ summary{
   }
 
   .flag{
-    height:3mm;
+    height:2.8mm;
     flex:none;
   }
 }
@@ -805,7 +800,9 @@ if(typeof document !== "undefined"){
 
     const inner = $("sheetInner");
     inner.style.transform = "none";
+    inner.style.transformOrigin = "top center";
 
+    // Mostra la banda inferiore completa per il Mittagstisch
     $("sheetBotBand").style.background = "";
     $("sheetBotImg").style.display = "block";
 
@@ -835,7 +832,7 @@ if(typeof document !== "undefined"){
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
 
-  /* VISUALIZZAZIONE EMPFEHLUNGSKARTE CON AUTO-SCALING E LARGHEZZA PIENA */
+  /* VISUALIZZAZIONE EMPFEHLUNGSKARTE CON SCALA PROPORZIONALE DINAMICA */
 
   function renderEmpfehlung(dishes){
 
@@ -845,6 +842,7 @@ if(typeof document !== "undefined"){
     $("sheetBotImg").style.display = "block";
 
     const container = $("dishes");
+
     container.innerHTML = "";
 
     let lastCat = "";
@@ -858,14 +856,17 @@ if(typeof document !== "undefined"){
       ){
 
         const catHeader = document.createElement("div");
+
         catHeader.className = "category-title";
         catHeader.textContent = dish.category;
 
         container.appendChild(catHeader);
+
         lastCat = dish.category;
       }
 
       const wrapper = document.createElement("div");
+
       wrapper.className = "dish-wrapper";
 
       const descHtml = dish.desc
@@ -887,16 +888,16 @@ if(typeof document !== "undefined"){
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
 
-    // Adattamento automatico dinamico della dimensione per far entrare tutto in una pagina senza sforare
+    // Adattamento proporzionale automatico se il contenuto supera lo spazio della pagina
     const inner = $("sheetInner");
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const maxHeight = 720; 
+      const availableHeight = 490; // Ridotto per lasciare spazio sufficiente alla casetta inferiore
       const currentHeight = inner.scrollHeight;
       
-      if (currentHeight > maxHeight) {
-        const scaleFactor = Math.max(0.6, maxHeight / currentHeight);
+      if (currentHeight > availableHeight) {
+        const scaleFactor = Math.max(0.6, availableHeight / currentHeight);
         inner.style.transform = `scale(${scaleFactor})`;
         inner.style.transformOrigin = "top center";
       } else {
@@ -904,7 +905,7 @@ if(typeof document !== "undefined"){
       }
     });
 
-    status("Generato: " + dishes.length + " elementi ottimizzati nella pagina a piena larghezza.");
+    status("Generato: " + dishes.length + " elementi in una singola pagina.");
 
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
@@ -914,11 +915,13 @@ if(typeof document !== "undefined"){
   $("goMittag").onclick = async () => {
 
     const day = $("dayMittag").value;
+
     status("Lettura dei dati Mittagstisch...");
 
     try{
 
       const targetUrl = $("urlMittag").value.trim();
+
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -927,6 +930,7 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(j.text,day);
 
       if(!dishes.length){
+
         status("Nessun piatto per " + day + " trovato sul sito.",true);
         return;
       }
@@ -934,6 +938,7 @@ if(typeof document !== "undefined"){
       renderMittag(day,dishes);
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
@@ -947,6 +952,7 @@ if(typeof document !== "undefined"){
     try{
 
       const targetUrl = $("urlEmpf").value.trim();
+
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -955,6 +961,7 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(j.text);
 
       if(!dishes.length){
+
         status("Nessun piatto trovato.",true);
         return;
       }
@@ -962,6 +969,7 @@ if(typeof document !== "undefined"){
       renderEmpfehlung(dishes);
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
@@ -978,6 +986,7 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(pasteContent,day);
 
       if(!dishes.length){
+
         status("Nessun piatto Mittagstisch nel testo.",true);
         return;
       }
@@ -989,6 +998,7 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(pasteContent);
 
       if(!dishes.length){
+
         status("Nessun piatto speciale nel testo.",true);
         return;
       }
@@ -1001,20 +1011,37 @@ if(typeof document !== "undefined"){
 
   async function saveFile(blob,name){
 
-    const file = new File([blob], name, {type:blob.type});
+    const file = new File(
+      [blob],
+      name,
+      {type:blob.type}
+    );
 
-    if(navigator.canShare && navigator.canShare({files:[file]})){
+    if(
+      navigator.canShare &&
+      navigator.canShare({files:[file]})
+    ){
+
       try{
-        await navigator.share({files:[file], title:name});
+
+        await navigator.share({
+          files:[file],
+          title:name
+        });
+
         return;
+
       }catch(e){
+
         if(e.name === "AbortError") return;
       }
     }
 
     const a = document.createElement("a");
+
     a.href = URL.createObjectURL(blob);
     a.download = name;
+
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1044,21 +1071,26 @@ if(typeof document !== "undefined"){
           ? "Mittagstisch"
           : "Empfehlungskarte";
 
-        await saveFile(blob, titleName + "_" + stamp() + ".png");
+        await saveFile(
+          blob,
+          titleName + "_" + stamp() + ".png"
+        );
+
         status("Immagine salvata!");
 
       },"image/png");
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
 
-  /* ESPORTAZIONE PDF A PIENA PAGINA SENZA MARGINI LATERALI */
+  /* ESPORTAZIONE PDF A PIENA LARGHEZZA COME NEL CODICE ORIGINALE */
 
   $("pdf").onclick = async () => {
 
-    status("Generazione del PDF a piena larghezza...");
+    status("Generazione del PDF in pagina unica...");
 
     try{
 
@@ -1070,17 +1102,44 @@ if(typeof document !== "undefined"){
       const a4Width = 595.28;
       const a4Height = 841.89;
 
-      const canvas = await html2canvas($("sheet"), {
+      const cloneSheet = $("sheet").cloneNode(true);
+      cloneSheet.style.display = "flex";
+      cloneSheet.style.flexDirection = "column";
+      cloneSheet.style.width = "500px";
+      cloneSheet.style.minHeight = "720px";
+      cloneSheet.style.height = "720px";
+      cloneSheet.style.margin = "0";
+      cloneSheet.style.boxShadow = "none";
+
+      const innerClone = cloneSheet.querySelector("#sheetInner");
+      const originalInner = $("sheetInner");
+      innerClone.style.transform = originalInner.style.transform;
+      innerClone.style.transformOrigin = "top center";
+
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "absolute";
+      tempContainer.style.top = "-9999px";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.width = "500px";
+      document.body.appendChild(tempContainer);
+
+      tempContainer.appendChild(cloneSheet);
+
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      const canvas = await html2canvas(cloneSheet, {
         useCORS: true,
         backgroundColor: "#ffffff",
         scale: 2
       });
 
+      tempContainer.remove();
+
       const imgData = canvas.toDataURL("image/png");
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      // Impostato a margine 0 o minimo assoluto per occupare tutta la larghezza dell'A4
+      // Scalato a larghezza A4 piena (senza margini bianchi ai lati)
       const margin = 0;
       const maxWidth = a4Width - margin * 2;
       const maxHeight = a4Height - margin * 2;
@@ -1110,9 +1169,10 @@ if(typeof document !== "undefined"){
         (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo a piena pagina!");
+      status("PDF generato con successo in una sola pagina a piena larghezza!");
 
     }catch(e){
+
       status("Errore: " + e.message, true);
     }
   };
