@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Krone Menù">
 <meta name="theme-color" content="#073334">
-<title>Krone Mittagstisch</title>
+<title>Krone Menù Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Librerie per esportazione PDF ed Immagine esatta -->
@@ -46,22 +46,22 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù (Visualizzazione Schermo) */
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
+  /* 🖥️ Foglio del Menù - RIMOSSI I LIMITI DI LARGHEZZA PER UN EFFETTO LARGHEZZA INTERA */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;margin-left:auto;margin-right:auto}
   
-  /* Dimensioni grandi ripristinate per il Mittagstisch */
-  .topband{background:#073334;padding:14px 0;text-align:center}
+  /* Loghi e bande verdi larghi e maestosi sul foglio */
+  .topband{background:#073334;padding:18px 0;text-align:center;width:100%}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
-  .botband{background:#073334;margin-top:18px;padding-top:12px}
+  .botband{background:#073334;margin-top:20px;padding-top:16px;width:100%}
   .botband img{width:68%;height:auto;display:block;margin:0 auto}
-  .flag{display:flex;height:7px}.flag i{flex:1}
+  .flag{display:flex;height:7px;width:100%}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
-  .inner{padding:20px 22px 6px}
+  .inner{padding:25px 35px 8px}
   
   /* ✍️ Scritte Uniformate al Font Quicksand 400 */
-  .title{text-align:center;color:var(--g);font-size:34px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
-  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:10px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:12px;border-bottom:1px solid var(--o);margin-bottom:14px}
-  .day{text-align:center;color:var(--g);font-size:24px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
+  .title{text-align:center;color:var(--g);font-size:36px;font-weight:400;font-family:'Quicksand',sans-serif;line-height:1.1;margin:0 0 4px}
+  .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
+  .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
   /* Piatti */
   .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
@@ -147,7 +147,7 @@
 
   <div id="status"></div>
 
-  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo -->
+  <!-- 🖥️ Foglio del Menù Visualizzato a Schermo (Adattato a larghezza massima) -->
   <div id="sheet">
     <div class="topband"><img src="logo_t.png" alt=""></div>
     <div class="inner">
@@ -430,7 +430,7 @@ if (typeof document !== "undefined") {
     } catch (e) { status("Errore: " + e.message, true); }
   };
 
-  // 📄 FUNZIONE: Salva PDF (Unico, largo e imponente per Mittagstisch, compatto multipagina per Empfehlungen)
+  // 📄 FUNZIONE: Salva PDF (Senza scritte delle pagine, bande verdi, loghi compattati e senza il giorno duplicato)
   $("pdf").onclick = async () => {
     status("Generazione del PDF...");
     try {
@@ -452,7 +452,6 @@ if (typeof document !== "undefined") {
       let currentPageIdx = 0;
       let currentHeightEstimate = 0;
       
-      // Seleziona l'altezza di soglia per l'impaginazione
       const maxHeightLimit = selectedMenuType === "mittag" ? 620 : 420; 
       
       elements.forEach((el) => {
