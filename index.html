@@ -222,9 +222,8 @@ summary{
   height:auto;
   display:block;
   margin:0 auto;
-  filter:brightness(0) saturate(100%)
-         invert(35%) sepia(76%) saturate(600%)
-         hue-rotate(8deg) brightness(85%) contrast(95%);
+  /* Converte l'immagine del logo esattamente nel colore oro della variabile --o (#C9A227) */
+  filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(542%) hue-rotate(5deg) brightness(95%) contrast(88%);
 }
 
 .botband{
@@ -1165,7 +1164,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA PER EMPFEHLUNGSKARTE */
+  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA SENZA CONTATORE */
 
   $("pdf").onclick = async () => {
 
@@ -1329,9 +1328,8 @@ if(typeof document !== "undefined"){
           dishesDiv.innerHTML = "";
 
           pageSheet.querySelector("#sheetTitle").textContent = titleText;
-          pageSheet.querySelector("#sheetSubtitle").textContent = pages.length > 1 
-            ? `${subtitleText} (${p + 1}/${pages.length})` 
-            : subtitleText;
+          // Imposta il sottotitolo fisso senza contatore di pagina (1/x)
+          pageSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
           pageSheet.querySelector("#sheetDay").style.display = "none";
 
           pages[p].forEach(el => {
