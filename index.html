@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  :root{--g:#073334;--o:#C9A227}
+  :root{--g:#073334;--g-trans:rgba(7, 51, 52, 0.5);--o:#C9A227}
   *{box-sizing:border-box}
   body{margin:0;font-family:'Quicksand',system-ui,sans-serif;color:#1a1a1a;background:#f4f1e8}
   header{background:var(--g);color:#fff;padding:18px 16px;text-align:center}
@@ -46,13 +46,11 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù - RIMOSSI I LIMITI DI LARGHEZZA PER UN EFFETTO LARGHEZZA INTERA */
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;margin-left:auto;margin-right:auto}
-  
-  /* Loghi e bande verdi larghi e maestosi sul foglio */
-  .topband{background:#073334;padding:18px 0;text-align:center;width:100%}
+  /* 🖥️ Foglio del Menù - LARGHEZZA INTERA CON VERDE AL 50% */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
+  .topband{background:var(--g-trans);padding:18px 0;text-align:center;width:100%}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
-  .botband{background:#073334;margin-top:20px;padding-top:16px;width:100%}
+  .botband{background:var(--g-trans);margin-top:20px;padding-top:16px;width:100%}
   .botband img{width:68%;height:auto;display:block;margin:0 auto}
   .flag{display:flex;height:7px;width:100%}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
@@ -63,7 +61,7 @@
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
   .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
-  /* Piatti */
+  /* Piatti senza tabelle o linee visive */
   .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
@@ -97,9 +95,9 @@
     body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center}
+    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center;background:var(--g-trans) !important}
     .topband img{height:41.9mm;width:auto}
-    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
+    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end;background:var(--g-trans) !important}
     .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
     .flag{height:2.8mm;flex:none}
     .inner{padding:8mm 16mm 0}
@@ -212,15 +210,23 @@ function extractCleanPrice(line) {
   return match ? (match[1] || match[2]) : null;
 }
 
-// 2. PARSER ISOLATO PER LA EMPFEHLUNGSKARTE
+// 2. PARSER SECURO ED ESCLUSIVO PER LA EMPFEHLUNGSKARTE
 function parseEmpfehlungskarte(text) {
   const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
   const dishes = [];
   let currentCategory = "";
   
+  // Lista dei giorni in minuscolo per escluderli al 100% dal parse delle raccomandazioni
+  const daysLow = DAYS.map(d => d.toLowerCase());
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const lineLow = line.toLowerCase();
+    
+    // ⚡ Filtro protettivo: Se incontra un giorno del Mittagstisch (es. "Montag"), lo ignora e salta
+    if (daysLow.includes(lineLow)) {
+      continue;
+    }
     
     if (CATEGORIES.includes(lineLow)) {
       currentCategory = line;
@@ -234,12 +240,15 @@ function parseEmpfehlungskarte(text) {
       
       if (i - 1 >= 0) {
         name = lines[i - 1];
-        if (CATEGORIES.includes(name.toLowerCase())) name = "Specialità dello Chef";
+        // Non permette diciture non correlate
+        if (CATEGORIES.includes(name.toLowerCase()) || daysLow.includes(name.toLowerCase())) {
+          name = "Specialità dello Chef";
+        }
       }
       
       if (i + 1 < lines.length) {
         const nextLine = lines[i + 1];
-        if (!extractCleanPrice(nextLine) && !CATEGORIES.includes(nextLine.toLowerCase())) {
+        if (!extractCleanPrice(nextLine) && !CATEGORIES.includes(nextLine.toLowerCase()) && !daysLow.includes(nextLine.toLowerCase())) {
           desc = nextLine;
         }
       }
@@ -256,7 +265,7 @@ function parseEmpfehlungskarte(text) {
 }
 
 if (typeof document !== "undefined") {
-  const $ = id => document.getElementById(id);
+  const \$ = id => document.getElementById(id);
   
   // Inizializzazione dropdown Mittagstisch
   const selectDay = $("dayMittag");
@@ -269,7 +278,7 @@ if (typeof document !== "undefined") {
   });
   selectDay.value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
 
-  const status = (t, err) => { $("status").textContent = t; $("status").className = err ? "err" : ""; };
+  const status = (t, err) => { \$("status").textContent = t; \$("status").className = err ? "err" : ""; };
 
   // Navigazione Tab
   $("tabMittag").onclick = () => {
@@ -406,144 +415,4 @@ if (typeof document !== "undefined") {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === "AbortError") return; }
     }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  }
-  
-  const stamp = () => new Date().toISOString().slice(0, 10);
-  
-  // 📸 FUNZIONE: Salva Foto
-  $("photo").onclick = async () => {
-    status("Generazione dell'immagine...");
-    try {
-      await document.fonts.ready;
-      const canvas = await html2canvas($("sheet"), {
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 2
-      });
-      canvas.toBlob(async (blob) => {
-        const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
-        await saveFile(blob, titleName + "_" + stamp() + ".png");
-        status("Immagine salvata!");
-      }, "image/png");
-    } catch (e) { status("Errore: " + e.message, true); }
-  };
-
-  // 📄 FUNZIONE: Salva PDF (Senza scritte delle pagine, bande verdi, loghi compattati e senza il giorno duplicato)
-  $("pdf").onclick = async () => {
-    status("Generazione del PDF...");
-    try {
-      await document.fonts.ready;
-      
-      const { PDFDocument } = PDFLib;
-      const pdfDoc = await PDFDocument.create();
-      
-      const a4Width = 595.28;
-      const a4Height = 841.89;
-      
-      const titleText = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
-      const subtitleText = selectedMenuType === "mittag" ? "TAGESGERICHTE" : "EMPFEHLUNGEN";
-      const dayText = $("sheetDay").textContent;
-      
-      const elements = Array.from($("dishes").children);
-      
-      let pagesContent = [[]];
-      let currentPageIdx = 0;
-      let currentHeightEstimate = 0;
-      
-      const maxHeightLimit = selectedMenuType === "mittag" ? 620 : 420; 
-      
-      elements.forEach((el) => {
-        let elHeight = el.offsetHeight || 30;
-        if (el.className === "category-title") elHeight += 15;
-        
-        if (currentHeightEstimate + elHeight > maxHeightLimit && pagesContent[currentPageIdx].length > 0) {
-          currentPageIdx++;
-          pagesContent[currentPageIdx] = [];
-          currentHeightEstimate = 0;
-        }
-        
-        pagesContent[currentPageIdx].push(el);
-        currentHeightEstimate += elHeight;
-      });
-      
-      for (let p = 0; p < pagesContent.length; p++) {
-        const tempContainer = document.createElement("div");
-        tempContainer.style.position = "absolute";
-        tempContainer.style.top = "-9999px";
-        tempContainer.style.left = "-9999px";
-        tempContainer.style.width = "500px";
-        document.body.appendChild(tempContainer);
-        
-        const cloneSheet = $("sheet").cloneNode(true);
-        cloneSheet.style.display = "block";
-        
-        // ⚡ Applica lo stile compatto di riduzione SOLO se stiamo stampando la Empfehlungskarte
-        if (selectedMenuType === "empfehlung") {
-          cloneSheet.classList.add("empf-pdf-compact");
-        }
-        
-        tempContainer.appendChild(cloneSheet);
-        
-        const dishesDiv = cloneSheet.querySelector("#dishes");
-        dishesDiv.innerHTML = "";
-        
-        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
-        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-        
-        if (selectedMenuType === "empfehlung") {
-          cloneSheet.querySelector("#sheetDay").style.display = "none";
-        } else {
-          cloneSheet.querySelector("#sheetDay").style.display = "block";
-          cloneSheet.querySelector("#sheetDay").textContent = dayText;
-        }
-        
-        pagesContent[p].forEach(el => {
-          dishesDiv.appendChild(el.cloneNode(true));
-        });
-        
-        const canvas = await html2canvas(cloneSheet, {
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          scale: 2
-        });
-        
-        tempContainer.remove();
-        
-        const imgData = canvas.toDataURL("image/png");
-        const page = pdfDoc.addPage([a4Width, a4Height]);
-        const pngImage = await pdfDoc.embedPng(imgData);
-        
-        const margin = 20;
-        const maxWidth = a4Width - (margin * 2);
-        const maxHeight = a4Height - (margin * 2);
-        
-        let finalWidth = maxWidth;
-        let finalHeight = (canvas.height * finalWidth) / canvas.width;
-        
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = (canvas.width * finalHeight) / canvas.height;
-        }
-        
-        const xPos = (a4Width - finalWidth) / 2;
-        const yPos = (a4Height - finalHeight) / 2;
-        
-        page.drawImage(pngImage, {
-          x: xPos,
-          y: yPos,
-          width: finalWidth,
-          height: finalHeight,
-        });
-      }
-      
-      const pdfBytes = await pdfDoc.save();
-      await saveFile(new Blob([pdfBytes], { type: "application/pdf" }), titleText + "_" + stamp() + ".pdf");
-      status("PDF salvato con successo!");
-    } catch (e) { status("Errore: " + e.message, true); }
-  };
-}
-</script>
-</body>
-</html>
+    const a = document.
