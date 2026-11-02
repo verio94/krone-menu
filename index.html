@@ -222,6 +222,7 @@ summary{
   height:auto;
   display:block;
   margin:0 auto;
+  /* Stesso filtro oro identico alla visualizzazione normale del sito */
   filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(542%) hue-rotate(5deg) brightness(95%) contrast(88%);
 }
 
@@ -346,15 +347,15 @@ summary{
   line-height:1.35;
 }
 
-/* CATEGORIE */
+/* CATEGORIE CON SPAZIATURA MAGGIORE */
 
 .category-title{
   color:var(--darkgold);
   font-size:15px;
   font-weight:700;
-  margin:11px 0 5px;
+  margin:18px 0 8px; /* Spaziaturà leggermente aumentata per pulizia visiva */
   border-bottom:1px dashed var(--o);
-  padding-bottom:4px;
+  padding-bottom:5px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
@@ -395,8 +396,8 @@ summary{
 
 .empf-pdf-compact .category-title{
   font-size:13.5px !important;
-  margin:5px 0 2px !important;
-  padding-bottom:2px !important;
+  margin:14px 0 6px !important; /* Spaziatura ottimizzata anche in versione PDF compatto */
+  padding-bottom:3px !important;
 }
 
 .empf-pdf-compact .dish-wrapper{
@@ -529,7 +530,7 @@ summary{
 
   .category-title{
     font-size:15px;
-    margin:8px 0 4px;
+    margin:15px 0 6px;
   }
 
   .botband{
@@ -1260,7 +1261,6 @@ if(typeof document !== "undefined"){
 
         const rawItems = Array.from($("dishes").children);
         
-        // Raggruppiamo logicamente i titoli di categoria insieme ai rispettivi piatti
         const groups = [];
         let currentGroup = { header: null, elements: [] };
 
@@ -1308,7 +1308,6 @@ if(typeof document !== "undefined"){
         let currentPageElements = [];
         let currentHeight = 0;
 
-        // Funzione di supporto per misurare l'altezza di un elemento HTML
         async function measureHeight(node) {
           const mDiv = document.createElement("div");
           mDiv.style.width = "450px";
@@ -1324,11 +1323,9 @@ if(typeof document !== "undefined"){
           const group = groups[g];
           let headerHeight = group.header ? await measureHeight(group.header) : 0;
 
-          // Se c'è un'intestazione di categoria, verifichiamo se ci sta insieme ad almeno il primo piatto
           if (group.header) {
             const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
             
-            // Se non c'abbastanza spazio per l'intestazione + il primo piatto, chiudiamo la pagina corrente
             if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
               pages.push(currentPageElements);
               currentPageElements = [];
@@ -1339,16 +1336,13 @@ if(typeof document !== "undefined"){
             currentHeight += headerHeight;
           }
 
-          // Inseriamo i piatti del gruppo uno ad uno
           for (let e = 0; e < group.elements.length; e++) {
             const dish = group.elements[e];
             const dishHeight = await measureHeight(dish);
 
             if (currentHeight + dishHeight > maxContentHeight && currentPageElements.length > 0) {
-              // Prima di spezzare, controlliamo se l'ultimo elemento rimasto nella pagina corrente è rimasto un titolo di categoria isolato
               const lastEl = currentPageElements[currentPageElements.length - 1];
               if (lastEl && lastEl.classList.contains("category-title")) {
-                // Spostiamo anche il titolo nella pagina nuova
                 currentPageElements.pop();
                 pages.push(currentPageElements);
                 currentPageElements = [lastEl, dish];
@@ -1369,7 +1363,6 @@ if(typeof document !== "undefined"){
           pages.push(currentPageElements);
         }
 
-        // Renderizziamo ogni pagina nel documento PDF finale
         for (let p = 0; p < pages.length; p++) {
           const pageSheet = $("sheet").cloneNode(true);
           pageSheet.style.display = "flex";
