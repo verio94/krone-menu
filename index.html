@@ -1121,19 +1121,22 @@ if(typeof document !== "undefined"){
       const a4Width = 595.28;
       const a4Height = 841.89;
 
+      const SHEET_W = 500;
+      const SHEET_H = Math.round(SHEET_W * a4Height / a4Width); // proporzioni A4 esatte
+
       const cloneSheet = $("sheet").cloneNode(true);
       cloneSheet.style.display = "flex";
       cloneSheet.style.flexDirection = "column";
-      cloneSheet.style.width = "500px";
-      cloneSheet.style.minHeight = "720px";
-      cloneSheet.style.height = "720px";
+      cloneSheet.style.width = SHEET_W + "px";
+      cloneSheet.style.maxWidth = "none";
+      cloneSheet.style.minHeight = SHEET_H + "px";
+      cloneSheet.style.height = SHEET_H + "px";
       cloneSheet.style.margin = "0";
+      cloneSheet.style.borderRadius = "0";
       cloneSheet.style.boxShadow = "none";
 
       const innerClone = cloneSheet.querySelector("#sheetInner");
-      const originalInner = $("sheetInner");
-      innerClone.style.transform = originalInner.style.transform;
-      innerClone.style.transformOrigin = "top center";
+      innerClone.style.transform = "none";
 
       // Empfehlungskarte: via banda colorata e casetta, resta solo la bandiera
       if(selectedMenuType === "empfehlung"){
@@ -1153,20 +1156,44 @@ if(typeof document !== "undefined"){
       }
 
       const tempContainer = document.createElement("div");
-      tempContainer.style.position = "absolute";
-      tempContainer.style.top = "-9999px";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.width = "500px";
+      tempContainer.style.position = "fixed";
+      tempContainer.style.top = "0";
+      tempContainer.style.left = "0";
+      tempContainer.style.width = SHEET_W + "px";
+      tempContainer.style.zIndex = "-1";
+      tempContainer.style.pointerEvents = "none";
       document.body.appendChild(tempContainer);
 
       tempContainer.appendChild(cloneSheet);
 
       await new Promise(resolve => requestAnimationFrame(resolve));
 
+      // Se il contenuto è più alto dello spazio disponibile, lo riduco
+      // ma allargo il box così occupa comunque tutta la larghezza
+      const need = innerClone.scrollHeight;
+      const have = innerClone.clientHeight;
+
+      if(need > have){
+        const s = have / need;
+        innerClone.style.width = (100 / s) + "%";
+        innerClone.style.transformOrigin = "top left";
+        innerClone.style.transform = "scale(" + s + ")";
+      }
+
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
       const canvas = await html2canvas(cloneSheet, {
         useCORS: true,
         backgroundColor: "#ffffff",
-        scale: 2
+        scale: 3,
+        width: SHEET_W,
+        height: SHEET_H,
+        windowWidth: SHEET_W,
+        windowHeight: SHEET_H,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0
       });
 
       tempContainer.remove();
@@ -1175,17 +1202,12 @@ if(typeof document !== "undefined"){
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      const finalWidth = a4Width;
-      const finalHeight = canvas.height * finalWidth / canvas.width;
-
-      const xPos = 0;
-      const yPos = (a4Height - finalHeight) / 2;
-
+      // Il foglio ha già le proporzioni A4: riempie tutta la pagina
       page.drawImage(pngImage, {
-        x: xPos,
-        y: yPos,
-        width: finalWidth,
-        height: finalHeight
+        x: 0,
+        y: 0,
+        width: a4Width,
+        height: a4Height
       });
 
       const pdfBytes = await pdfDoc.save();
