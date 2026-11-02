@@ -563,7 +563,6 @@ let selectedMenuType = "mittag";
 function autoScaleContent(innerElement) {
   innerElement.style.transform = "none";
   requestAnimationFrame(() => {
-    // Altezza massima consentita per lasciare ampio respiro e margine di sicurezza in basso (circa 2 cm)
     const maxAllowedHeight = 445; 
     const currentHeight = innerElement.scrollHeight;
     
@@ -1029,27 +1028,25 @@ if(typeof document !== "undefined"){
     try{
 
       await document.fonts.ready;
+      window.scrollTo(0, 0);
 
-      if ($("sheetTitle").textContent.toLowerCase().includes("empfehlung")) {
+      const isEmpf = $("sheetTitle").textContent.toLowerCase().includes("empfehlung");
+      if (isEmpf) {
         $("sheetBotBand").style.background = "transparent";
         $("sheetBotImg").style.display = "none";
       }
 
       const canvas = await html2canvas($("sheet"),{
-        useCORS:true,
-        backgroundColor:"#ffffff",
-        scale:2
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2,
+        scrollY: 0
       });
 
       canvas.toBlob(async blob => {
-
-        const titleName = selectedMenuType === "mittag"
-          ? "Mittagstisch"
-          : "Empfehlungskarte";
-
+        const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
         await saveFile(blob, titleName + "_" + stamp() + ".png");
         status("Immagine salvata!");
-
       },"image/png");
 
     }catch(e){
@@ -1057,7 +1054,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF CON CALCOLO SCALA AUTOMATICO SUL CLONE */
+  /* ESPORTAZIONE PDF CORRETTA SENZA CLONI ERRATI E CON MARGINE DI SICUREZZA */
 
   $("pdf").onclick = async () => {
 
@@ -1066,6 +1063,30 @@ if(typeof document !== "undefined"){
     try{
 
       await document.fonts.ready;
+      window.scrollTo(0, 0); // Riporta la pagina in alto per evitare offset di cattura
+
+      const isEmpf = $("sheetTitle").textContent.toLowerCase().includes("empfehlung");
+      const originalBotBackground = $("sheetBotBand").style.background;
+      const originalBotImgDisplay = $("sheetBotImg").style.display;
+
+      if (isEmpf) {
+        $("sheetBotBand").style.background = "transparent";
+        $("sheetBotImg").style.display = "none";
+      }
+
+      // Cattura diretta dell'elemento originale senza cloni che sballano le altezze
+      const canvas = await html2canvas($("sheet"), {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2,
+        scrollY: 0
+      });
+
+      // Ripristina lo stato a schermo dell'elemento originale
+      if (isEmpf) {
+        $("sheetBotBand").style.background = originalBotBackground;
+        $("sheetBotImg").style.display = originalBotImgDisplay;
+      }
 
       const {PDFDocument} = PDFLib;
       const pdfDoc = await PDFDocument.create();
@@ -1073,75 +1094,27 @@ if(typeof document !== "undefined"){
       const a4Width = 595.28;
       const a4Height = 841.89;
 
-      const cloneSheet = $("sheet").cloneNode(true);
-      cloneSheet.style.display = "flex";
-      cloneSheet.style.flexDirection = "column";
-      cloneSheet.style.width = "500px";
-      cloneSheet.style.minHeight = "720px";
-      cloneSheet.style.height = "720px";
-      cloneSheet.style.margin = "0";
-      cloneSheet.style.boxShadow = "none";
-
-      const currentTitle = $("sheetTitle").textContent.toLowerCase();
-      if (currentTitle.includes("empfehlung")) {
-        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
-        if (botBandClone) {
-          botBandClone.style.background = "transparent";
-        }
-        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
-        if (botImgClone) {
-          botImgClone.remove();
-        }
-      }
-
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "absolute";
-      tempContainer.style.top = "-9999px";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.width = "500px";
-      document.body.appendChild(tempContainer);
-
-      tempContainer.appendChild(cloneSheet);
-
-      // Applica lo stesso ridimensionamento automatico anche al clone del PDF in tempo reale
-      const innerClone = cloneSheet.querySelector("#sheetInner");
-      autoScaleContent(innerClone);
-
-      await new Promise(resolve => setTimeout(resolve, 50)); // Attende che il layout si assesti
-
-      const canvas = await html2canvas(cloneSheet, {
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 2
-      });
-
-      tempContainer.remove();
-
       const imgData = canvas.toDataURL("image/png");
-      const page = pdfDoc.addPage([a4Width, a4Height]);
-      const pngImage = await pdfDoc.embedPng(imgData);
+      const pdfImage = await pdfDoc.embedPng(imgData);
 
-      // Margine di sicurezza generoso (circa 2 cm - 60 punti) per garantire che nulla tocchi i bordi
-      const margin = 60;
+      const page = pdfDoc.addPage([a4Width, a4Height]);
+
+      // Margine di sicurezza di circa 2 cm (50 punti) per lato per lasciare respiro e bandiera perfetta
+      const margin = 50;
       const maxWidth = a4Width - (margin * 2);
       const maxHeight = a4Height - (margin * 2);
 
-      let finalWidth = maxWidth;
-      let finalHeight = canvas.height * finalWidth / canvas.width;
+      // Scala automatica proporzionale che fa rientrare tutto senza tagli
+      const scaled = pdfImage.scaleToFit(maxWidth, maxHeight);
 
-      if (finalHeight > maxHeight) {
-        finalHeight = maxHeight;
-        finalWidth = canvas.width * finalHeight / canvas.height;
-      }
+      const xPos = (a4Width - scaled.width) / 2;
+      const yPos = (a4Height - scaled.height) / 2;
 
-      const xPos = (a4Width - finalWidth) / 2;
-      const yPos = (a4Height - finalHeight) / 2;
-
-      page.drawImage(pngImage, {
+      page.drawImage(pdfImage, {
         x: xPos,
         y: yPos,
-        width: finalWidth,
-        height: finalHeight
+        width: scaled.width,
+        height: scaled.height
       });
 
       const pdfBytes = await pdfDoc.save();
@@ -1151,7 +1124,7 @@ if(typeof document !== "undefined"){
         (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo con scala automatica e margine di sicurezza!");
+      status("PDF generato con successo in pagina unica!");
 
     }catch(e){
       status("Errore: " + e.message, true);
