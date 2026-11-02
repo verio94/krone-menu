@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  :root{--g:#073334;--g-trans:rgba(7, 51, 52, 0.5);--o:#C9A227}
+  :root{--g:#073334;--o:#C9A227}
   *{box-sizing:border-box}
   body{margin:0;font-family:'Quicksand',system-ui,sans-serif;color:#1a1a1a;background:#f4f1e8}
   header{background:var(--g);color:#fff;padding:18px 16px;text-align:center}
@@ -46,11 +46,13 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù - LARGHEZZA INTERA CON VERDE AL 50% */
-  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
-  .topband{background:var(--g-trans);padding:18px 0;text-align:center;width:100%}
+  /* 🖥️ Foglio del Menù - RIMOSSI I LIMITI DI LARGHEZZA PER UN EFFETTO LARGHEZZA INTERA */
+  #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;margin-left:auto;margin-right:auto}
+  
+  /* Loghi e bande verdi larghi e maestosi sul foglio */
+  .topband{background:#073334;padding:18px 0;text-align:center;width:100%}
   .topband img{width:46%;height:auto;display:block;margin:0 auto}
-  .botband{background:var(--g-trans);margin-top:20px;padding-top:16px;width:100%}
+  .botband{background:#073334;margin-top:20px;padding-top:16px;width:100%}
   .botband img{width:68%;height:auto;display:block;margin:0 auto}
   .flag{display:flex;height:7px;width:100%}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
@@ -61,7 +63,7 @@
   .sub{text-align:center;color:var(--o);letter-spacing:.3em;font-size:11px;font-weight:700;font-family:'Quicksand',sans-serif;padding-bottom:14px;border-bottom:1px solid var(--o);margin-bottom:16px}
   .day{text-align:center;color:var(--g);font-size:26px;font-weight:400;font-family:'Quicksand',sans-serif;margin:6px 0 6px}
   
-  /* Piatti senza tabelle o linee visive */
+  /* Piatti */
   .dish-wrapper{padding:8px 0;border-bottom:1px solid #eee}
   .dish-wrapper:last-of-type{border-bottom:none}
   .dish{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;font-size:16px;font-family:'Quicksand',sans-serif}
@@ -81,50 +83,4 @@
   .empf-pdf-compact .botband img { width: 48% !important; }
   .empf-pdf-compact .flag { height: 5px !important; }
   .empf-pdf-compact .inner { padding: 10px 22px 2px !important; }
-  .empf-pdf-compact .title { font-size: 24px !important; margin-bottom: 2px !important; }
-  .empf-pdf-compact .sub { padding-bottom: 6px !important; margin-bottom: 6px !important; }
-  .empf-pdf-compact .category-title { font-size: 13px !important; margin: 6px 0 3px 0 !important; }
-  .empf-pdf-compact .dish-wrapper { padding: 3px 0 !important; }
-  .empf-pdf-compact .dish { font-size: 12px !important; }
-  .empf-pdf-compact .dish .n { font-size: 12px !important; }
-  .empf-pdf-compact .dish .p { font-size: 12px !important; }
-  .empf-pdf-compact .desc { font-size: 9px !important; margin-top: 1px !important; }
-
-  @media print{
-    @page{size:A4;margin:0}
-    body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
-    main{padding:0;max-width:none}
-    #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:50.8mm;padding:0;display:flex;align-items:center;justify-content:center;background:var(--g-trans) !important}
-    .topband img{height:41.9mm;width:auto}
-    .botband{margin-top:auto;height:80mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end;background:var(--g-trans) !important}
-    .botband img{width:139.7mm;margin-bottom:auto;margin-top:auto}
-    .flag{height:2.8mm;flex:none}
-    .inner{padding:8mm 16mm 0}
-    .title{font-size:40px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .day{font-size:28px;font-weight:400;font-family:'Quicksand',sans-serif}
-    .dish{font-size:17px;padding:12px 0;font-family:'Quicksand',sans-serif}
-  }
-</style>
-</head>
-<body>
-
-<header><b>KRONE</b><h1 id="mainHeaderTitle">Mittagstisch</h1></header>
-<main>
-  <!-- Navigazione Tab Assoluta e Isolata -->
-  <label>Seleziona Cosa Vuoi Creare:</label>
-  <div class="tab-container">
-    <button class="tab-btn active" id="tabMittag">1. Mittagstisch</button>
-    <button class="tab-btn" id="tabEmpf">2. Empfehlungskarte</button>
-  </div>
-
-  <div class="quick-links">
-    <p>🔗 Link Rapidi al tuo Sito:</p>
-    <a href="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c" target="_blank">Apri Mittagstisch</a>
-    <a href="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7" target="_blank">Apri Empfehlungskarte</a>
-  </div>
-
-  <!-- 🟢 SEZIONE A: MITTAGSTISCH -->
-  <div id="sectionMittag" class="menu-section active">
-    <label for="urlMittag">Link della pagina pranzo</label>
-    <input id="urlMittag" type="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523
+  .empf-pdf-compact .title { font-s
