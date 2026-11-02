@@ -1,258 +1,1400 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Krone Menù">
+<meta name="theme-color" content="#073334">
+<title>Krone Menù Generator</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+:root{
+  --g:#073334;
+  --o:#C9A227;
+  --darkgold:#80600C;
+  --gband:rgba(7,51,52,0.12);
+}
+
+*{box-sizing:border-box}
+
+html{
+  background:#f4f1e8;
+  color-scheme:light;
+}
+
+body{
+  margin:0;
+  font-family:'Quicksand',system-ui,sans-serif;
+  color:#1a1a1a;
+  background:#f4f1e8;
+}
+
+header{
+  background:var(--g);
+  color:#fff;
+  padding:18px 16px;
+  text-align:center;
+  border-bottom:1px solid var(--g);
+}
+
+header b{
+  color:var(--o);
+  letter-spacing:.2em;
+  font-size:13px;
+}
+
+header h1{
+  margin:4px 0 0;
+  font-weight:500;
+  font-size:26px;
+  color:#fff;
+}
+
+main{
+  max-width:640px;
+  margin:0 auto;
+  padding:20px 14px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  color:var(--g);
+  margin:12px 0 4px;
+  font-size:14px;
+}
+
+input,select,textarea{
+  width:100%;
+  font:inherit;
+  padding:12px;
+  border:1px solid #cfc9b6;
+  border-radius:10px;
+  background:#fff;
+  color:#1a1a1a;
+}
+
+button{
+  font:inherit;
+  font-weight:700;
+  border:0;
+  border-radius:12px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+
+.main{
+  background:var(--g);
+  color:#fff;
+  border:1px solid var(--g);
+  width:100%;
+  margin-top:14px;
+  font-size:17px;
+}
+
+.main:hover{
+  background:rgba(7,51,52,.9);
+}
+
+.alt{
+  background:var(--o);
+  color:#1a1a1a;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+
+.row button{flex:1}
+
+#status{
+  margin:12px 0;
+  color:#444;
+  font-size:14px;
+  white-space:pre-wrap;
+}
+
+#status.err{color:#a02020}
+
+details{
+  margin-top:16px;
+  background:#fff;
+  border-radius:10px;
+  padding:10px 12px;
+  border:1px solid #cfc9b6;
+}
+
+summary{
+  font-weight:700;
+  color:var(--g);
+}
+
+.tab-container{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.tab-btn{
+  flex:1;
+  background:#fff;
+  border:2px solid var(--g);
+  color:var(--g);
+  border-radius:10px;
+  padding:12px;
+  cursor:pointer;
+  transition:all .2s;
+  font-size:15px;
+}
+
+.tab-btn.active{
+  background:var(--g);
+  color:#fff;
+}
+
+.menu-section{display:none}
+.menu-section.active{display:block}
+
+.quick-links{
+  margin:10px 0;
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  border:1px solid #cfc9b6;
+}
+
+.quick-links p{
+  margin:0 0 6px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--g);
+}
+
+.quick-links a{
+  display:inline-block;
+  margin-right:15px;
+  color:var(--g);
+  text-decoration:none;
+  font-size:13px;
+  font-weight:700;
+  border-bottom:1px solid var(--o);
+  padding-bottom:1px;
+}
+
+.quick-links a:hover{color:var(--o)}
+
+/* FOGLIO MENU */
+
+#sheet{
+  display:none;
+  flex-direction:column;
+  min-height:720px;
+  background:#fff;
+  margin-top:16px;
+  border-radius:6px;
+  box-shadow:0 2px 10px #0002;
+  overflow:hidden;
+  width:100%;
+  max-width:500px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.topband{
+  background:var(--gband);
+  padding:13px 0;
+  text-align:center;
+  width:100%;
+  flex-shrink:0;
+}
+
+.topband img{
+  width:43%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+  filter:brightness(0) saturate(100%)
+         invert(35%) sepia(76%) saturate(600%)
+         hue-rotate(8deg) brightness(85%) contrast(95%);
+}
+
+.botband{
+  background:var(--gband);
+  margin-top:auto;
+  padding-top:12px;
+  width:100%;
+  flex-shrink:0;
+}
+
+.botband img{
+  width:60%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+  filter:brightness(0) saturate(100%)
+         invert(35%) sepia(76%) saturate(600%)
+         hue-rotate(8deg) brightness(85%) contrast(95%);
+}
+
+.flag{
+  display:flex;
+  height:7px;
+  width:100%;
+}
+
+.flag i{flex:1}
+.flag i:nth-child(1){background:#295E28}
+.flag i:nth-child(2){background:#ECE6D5}
+.flag i:nth-child(3){background:#B60D08}
+
+/* AREA TESTO */
+
+.inner{
+  padding:19px 30px 10px;
+  flex:1;
+  min-height:0;
+}
+
+.title{
+  text-align:center;
+  color:var(--g);
+  font-size:32px;
+  font-weight:400;
+  font-family:'Quicksand',sans-serif;
+  line-height:1.15;
+  margin:0 0 4px;
+}
+
+.sub{
+  text-align:center;
+  color:var(--o);
+  letter-spacing:.3em;
+  font-size:11px;
+  font-weight:700;
+  font-family:'Quicksand',sans-serif;
+  padding-bottom:11px;
+  border-bottom:1px solid var(--o);
+  margin-bottom:12px;
+}
+
+.day{
+  text-align:center;
+  color:var(--g);
+  font-size:23px;
+  font-weight:400;
+  font-family:'Quicksand',sans-serif;
+  margin:5px 0 7px;
+}
+
+/* PIATTI */
+
+.dish-wrapper{
+  padding:6px 0;
+  border-bottom:1px solid #e8e8e8;
+}
+
+.dish-wrapper:last-of-type{
+  border-bottom:none;
+}
+
+.dish{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding:3px 0;
+  font-size:14px;
+  line-height:1.4;
+  font-family:'Quicksand',sans-serif;
+}
+
+.dish .n{
+  outline:none;
+  text-align:left;
+  font-weight:400;
+  font-family:'Quicksand',sans-serif;
+  flex:1;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+.dish .p{
+  font-weight:700;
+  color:var(--g);
+  outline:none;
+  white-space:nowrap;
+  text-align:right;
+  font-family:'Quicksand',sans-serif;
+  flex-shrink:0;
+}
+
+.desc{
+  font-size:10.5px;
+  color:#666;
+  font-style:italic;
+  margin-top:2px;
+  text-align:left;
+  outline:none;
+  font-family:'Quicksand',sans-serif;
+  line-height:1.35;
+}
+
+/* CATEGORIE */
+
+.category-title{
+  color:var(--darkgold);
+  font-size:15px;
+  font-weight:700;
+  margin:11px 0 5px;
+  border-bottom:1px dashed var(--o);
+  padding-bottom:4px;
+  text-transform:uppercase;
+  font-family:'Quicksand',sans-serif;
+  text-align:center;
+  line-height:1.2;
+}
+
+.hint{
+  font-size:12px;
+  color:#777;
+  text-align:center;
+  margin-top:8px;
+}
+
+/* OTTIMIZZAZIONE PDF: EMPFEHLUNGSKARTE */
+
+.empf-pdf-compact .topband{
+  padding:9px 0 !important;
+}
+
+.empf-pdf-compact .topband img{
+  width:34% !important;
+}
+
+.empf-pdf-compact .inner{
+  padding:12px 25px 5px !important;
+}
+
+.empf-pdf-compact .title{
+  font-size:27px !important;
+  margin-bottom:2px !important;
+}
+
+.empf-pdf-compact .sub{
+  padding-bottom:7px !important;
+  margin-bottom:7px !important;
+}
+
+.empf-pdf-compact .category-title{
+  font-size:14px !important;
+  margin:7px 0 3px !important;
+}
+
+.empf-pdf-compact .dish-wrapper{
+  padding:4px 0 !important;
+}
+
+.empf-pdf-compact .dish{
+  font-size:12.5px !important;
+  line-height:1.3 !important;
+  padding:2px 0 !important;
+}
+
+.empf-pdf-compact .dish .n,
+.empf-pdf-compact .dish .p{
+  font-size:12.5px !important;
+}
+
+.empf-pdf-compact .desc{
+  font-size:9.5px !important;
+  line-height:1.3 !important;
+  margin-top:1px !important;
+}
+
+.empf-pdf-compact .botband{
+  margin-top:auto !important;
+  padding-top:6px !important;
+}
+
+.empf-pdf-compact .botband img{
+  width:48% !important;
+}
+
+/* STAMPA A4 */
+
+@media print{
+
+  @page{
+    size:A4;
+    margin:0;
+  }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:#fff;
+  }
+
+  body{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  main>*:not(#sheet),
+  .hint{
+    display:none!important;
+  }
+
+  main{
+    padding:0;
+    max-width:none;
+    margin:0;
+  }
+
+  #sheet{
+    display:flex!important;
+    flex-direction:column;
+    width:210mm;
+    height:297mm;
+    min-height:297mm;
+    max-width:none;
+    box-shadow:none;
+    margin:0;
+    border-radius:0;
+    overflow:hidden;
+    page-break-after:avoid;
+    break-after:avoid;
+  }
+
+  .topband{
+    height:50mm;
+    min-height:50mm;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gband)!important;
+  }
+
+  .topband img{
+    height:39mm;
+    width:auto;
+  }
+
+  .inner{
+    flex:1;
+    min-height:0;
+    padding:7mm 15mm 2mm;
+  }
+
+  .title{
+    font-size:34px;
+    font-weight:400;
+  }
+
+  .sub{
+    font-size:11px;
+    padding-bottom:7mm;
+    margin-bottom:8px;
+  }
+
+  .day{
+    font-size:25px;
+    margin:4px 0 5px;
+  }
+
+  .dish-wrapper{
+    padding:5px 0;
+  }
+
+  .dish{
+    font-size:14px;
+    padding:3px 0;
+    line-height:1.3;
+  }
+
+  .desc{
+    font-size:10px;
+    line-height:1.3;
+  }
+
+  .category-title{
+    font-size:15px;
+    margin:8px 0 4px;
+  }
+
+  .botband{
+    margin-top:auto;
+    height:72mm;
+    min-height:72mm;
+    padding-top:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    background:var(--gband)!important;
+    flex-shrink:0;
+  }
+
+  .botband img{
+    width:125mm;
+    margin-bottom:auto;
+    margin-top:auto;
+  }
+
+  .flag{
+    height:2.8mm;
+    flex:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <b>KRONE</b>
+  <h1 id="mainHeaderTitle">Mittagstisch</h1>
+</header>
+
+<main>
+
+  <label>Seleziona Cosa Vuoi Creare:</label>
+
+  <div class="tab-container">
+    <button class="tab-btn active" id="tabMittag">1. Mittagstisch</button>
+    <button class="tab-btn" id="tabEmpf">2. Empfehlungskarte</button>
+  </div>
+
+  <div class="quick-links">
+    <p>🔗 Link Rapidi al tuo Sito:</p>
+    <a href="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c" target="_blank">Apri Mittagstisch</a>
+    <a href="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7" target="_blank">Apri Empfehlungskarte</a>
+  </div>
+
+  <!-- MITTAGSTISCH -->
+
+  <div id="sectionMittag" class="menu-section active">
+
+    <label for="urlMittag">Link della pagina pranzo</label>
+    <input id="urlMittag" type="url" value="https://trattoria-pizzeria-krone.de/home#a9be7e1c-5c87-4fd2-88f6-b17fd602523c">
+
+    <label for="dayMittag">Seleziona Giorno della Settimana</label>
+    <select id="dayMittag"></select>
+
+    <button class="main" id="goMittag">Crea Menù Mittagstisch</button>
+  </div>
+
+  <!-- EMPFEHLUNGSKARTE -->
+
+  <div id="sectionEmpf" class="menu-section">
+
+    <label for="urlEmpf">Link della pagina raccomandazioni</label>
+    <input id="urlEmpf" type="url" value="https://trattoria-pizzeria-krone.de/home#03ce3203-1647-403b-8655-5e0b8d18a3a7">
+
+    <button class="main" id="goEmpf">Crea Menù Empfehlungskarte</button>
+  </div>
+
+  <div id="status"></div>
+
+  <!-- FOGLIO MENU -->
+
+  <div id="sheet">
+
+    <div class="topband">
+      <img src="logo_t.png" alt="KRONE">
+    </div>
+
+    <div class="inner">
+
+      <div class="title" id="sheetTitle">Mittagstisch</div>
+      <div class="sub" id="sheetSubtitle">TAGESGERICHTE</div>
+      <div class="day" id="sheetDay"></div>
+      <div id="dishes"></div>
+
+    </div>
+
+    <div class="botband">
+      <img src="foot_t.png" alt="">
+      <div class="flag">
+        <i></i><i></i><i></i>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hint" id="hint" style="display:none">
+    Puoi toccare un piatto, una descrizione o un prezzo per correggerlo prima di salvare.
+  </div>
+
+  <div class="row" id="actions" style="display:none">
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva PDF</button>
+  </div>
+
+  <details id="manualPasteDetails">
+    <summary>Se non legge il sito: incolla il testo</summary>
+    <p style="font-size:13px;margin:8px 0">Copia dal sito il testo e incollalo qui sotto.</p>
+    <textarea id="paste" rows="8" placeholder="Incolla il testo del menù copiato dal sito..."></textarea>
+    <button class="main" id="usePaste">Usa il testo incollato</button>
+  </details>
+
+</main>
+
+<script>
+const DAYS = [
+  "Montag","Dienstag","Mittwoch","Donnerstag",
+  "Freitag","Samstag","Sonntag"
+];
+
+const PRICE_REGEX = /^\s*(?:€\s*)?(\d{1,3}(?:[.,]\d{1,2})?)\s*(?:€|EUR)?\s*$/;
+
+const CATEGORIES = [
+  "vorspeisen",
+  "hauptgerichte",
+  "getränke",
+  "desserts"
+];
+
+let selectedMenuType = "mittag";
+
+/* PARSER MITTAGSTISCH */
+
+function parseMittagstisch(text, day){
+
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const daysLow = DAYS.map(d => d.toLowerCase());
+
+  for(let i=0;i<lines.length;i++){
+
+    if(lines[i].toLowerCase() !== day.toLowerCase()) continue;
+
+    const dishes = [];
+    let buf = [];
+
+    for(let j=i+1;j<lines.length;j++){
+
+      const x = lines[j];
+
+      if(daysLow.includes(x.toLowerCase())) break;
+
+      const m = x.match(PRICE_REGEX);
+
+      if(m){
+
+        if(buf.length){
+          dishes.push([buf.slice(-2).join(" "),m[1]]);
+        }
+
+        buf = [];
+
+      }else{
+
+        buf.push(x);
+
+        if(dishes.length && buf.length > 3) break;
+      }
+    }
+
+    if(dishes.length) return dishes;
+  }
+
+  return [];
+}
+
+/* ESTRAZIONE PREZZI */
+
+function extractCleanPrice(line){
+
+  const cleaned = line.replace(/€/g,"").replace(/EUR/g,"").trim();
+
+  const match = cleaned.match(/^(\d{1,3}[.,]\d{2})$|^(\d{1,3})$/);
+
+  return match ? (match[1] || match[2]) : null;
+}
+
+/* PARSER EMPFEHLUNGSKARTE */
+
+function parseEmpfehlungskarte(text){
+
+  const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+  const dishes = [];
+
+  let currentCategory = "";
+
+  const daysLow = DAYS.map(d => d.toLowerCase());
+
+  let mittagStartIdx = -1;
+  let mittagEndIdx = -1;
+
+  for(let i=0;i<lines.length;i++){
+
+    const lineLow = lines[i].toLowerCase();
+
+    if(daysLow.includes(lineLow)){
+
+      if(mittagStartIdx === -1){
+        mittagStartIdx = i;
+      }
+
+      mittagEndIdx = i;
+    }
+  }
+
+  let rangeToSkipStart = -1;
+  let rangeToSkipEnd = -1;
+
+  if(mittagStartIdx !== -1){
+
+    rangeToSkipStart = mittagStartIdx;
+    rangeToSkipEnd = lines.length;
+
+    for(let k=mittagEndIdx+1;k<lines.length;k++){
+
+      if(CATEGORIES.includes(lines[k].toLowerCase())){
+        rangeToSkipEnd = k;
+        break;
+      }
+    }
+  }
+
+  for(let i=0;i<lines.length;i++){
+
+    if(i>=rangeToSkipStart && i<rangeToSkipEnd){
+      continue;
+    }
+
+    const line = lines[i];
+    const lineLow = line.toLowerCase();
+
+    if(CATEGORIES.includes(lineLow)){
+      currentCategory = line;
+      continue;
+    }
+
+    const priceVal = extractCleanPrice(line);
+
+    if(priceVal){
+
+      let name = "";
+      let desc = "";
+
+      if(i-1>=0){
+
+        name = lines[i-1];
+
+        if(
+          CATEGORIES.includes(name.toLowerCase()) ||
+          daysLow.includes(name.toLowerCase())
+        ){
+          name = "Specialità dello Chef";
+        }
+      }
+
+      if(i+1<lines.length){
+
+        const nextLine = lines[i+1];
+
+        if(
+          !extractCleanPrice(nextLine) &&
+          !CATEGORIES.includes(nextLine.toLowerCase()) &&
+          !daysLow.includes(nextLine.toLowerCase())
+        ){
+          desc = nextLine;
+        }
+      }
+
+      dishes.push({
+        category:currentCategory || "Empfehlungen",
+        name:name,
+        price:priceVal,
+        desc:desc
+      });
+    }
+  }
+
+  return dishes;
+}
+
+/* INIZIALIZZAZIONE */
+
+if(typeof document !== "undefined"){
+
+  const $ = id => document.getElementById(id);
+
+  const selectDay = $("dayMittag");
+
+  selectDay.innerHTML = "";
+
+  const todayDe = new Date().toLocaleDateString(
+    "de-DE",
+    {
+      weekday:"long",
+      timeZone:"Europe/Berlin"
+    }
+  );
+
+  DAYS.forEach(d => {
+
+    const o = document.createElement("option");
+
+    o.value = d;
+    o.textContent = d;
+
+    selectDay.appendChild(o);
+  });
+
+  selectDay.value = DAYS.slice(0,5).includes(todayDe)
+    ? todayDe
+    : "Montag";
+
+  const status = (t,err) => {
+
+    $("status").textContent = t;
+    $("status").className = err ? "err" : "";
+  };
+
+  /* CAMBIO TAB */
+
+  $("tabMittag").onclick = () => {
+
+    selectedMenuType = "mittag";
+
+    $("tabMittag").classList.add("active");
+    $("tabEmpf").classList.remove("active");
+
+    $("sectionMittag").classList.add("active");
+    $("sectionEmpf").classList.remove("active");
+
+    $("mainHeaderTitle").textContent = "Mittagstisch";
+    $("sheetTitle").textContent = "Mittagstisch";
+    $("sheetSubtitle").textContent = "TAGESGERICHTE";
+
+    status("");
+  };
+
+  $("tabEmpf").onclick = () => {
+
+    selectedMenuType = "empfehlung";
+
+    $("tabEmpf").classList.add("active");
+    $("tabMittag").classList.remove("active");
+
+    $("sectionEmpf").classList.add("active");
+    $("sectionMittag").classList.remove("active");
+
+    $("mainHeaderTitle").textContent = "Empfehlungskarte";
+    $("sheetTitle").textContent = "Empfehlungskarte";
+    $("sheetSubtitle").textContent = "EMPFEHLUNGEN";
+
+    status("");
+  };
+
+  /* VISUALIZZAZIONE MITTAGSTISCH */
+
+  function renderMittag(day,dishes){
+
+    $("sheetDay").style.display = "block";
+    $("sheetDay").textContent = day;
+
+    $("dishes").innerHTML = "";
+
+    dishes.forEach(([n,p]) => {
+
+      const row = document.createElement("div");
+      row.className = "dish";
+
+      row.innerHTML =
+        '<span class="n" contenteditable="true"></span>' +
+        '<span class="p" contenteditable="true"></span>';
+
+      row.querySelector(".n").textContent = n;
+      row.querySelector(".p").textContent = p + " €";
+
+      $("dishes").appendChild(row);
+    });
+
+    $("sheet").style.display = "flex";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+
+    status("Generato: " + dishes.length + " piatti per " + day + ".");
+
+    $("sheet").scrollIntoView({behavior:"smooth"});
+  }
+
+  /* VISUALIZZAZIONE EMPFEHLUNGSKARTE */
+
+  function renderEmpfehlung(dishes){
+
+    $("sheetDay").style.display = "none";
+
+    const container = $("dishes");
+
+    container.innerHTML = "";
+
+    let lastCat = "";
+
+    dishes.forEach(dish => {
+
+      if(
+        dish.category &&
+        dish.category !== lastCat &&
+        dish.category.toLowerCase() !== "empfehlungen"
+      ){
+
+        const catHeader = document.createElement("div");
+
+        catHeader.className = "category-title";
+        catHeader.textContent = dish.category;
+
+        container.appendChild(catHeader);
+
+        lastCat = dish.category;
+      }
+
+      const wrapper = document.createElement("div");
+
+      wrapper.className = "dish-wrapper";
+
+      const descHtml = dish.desc
+        ? `<div class="desc" contenteditable="true">${dish.desc}</div>`
+        : "";
+
+      wrapper.innerHTML = `
+        <div class="dish">
+          <span class="n" contenteditable="true">${dish.name}</span>
+          <span class="p" contenteditable="true">${dish.price} €</span>
+        </div>
+        ${descHtml}
+      `;
+
+      container.appendChild(wrapper);
+    });
+
+    $("sheet").style.display = "flex";
+    $("actions").style.display = "flex";
+    $("hint").style.display = "block";
+
+    status("Generato: " + dishes.length + " elementi.");
+
+    $("sheet").scrollIntoView({behavior:"smooth"});
+  }
+
+  /* LETTURA SITO MITTAGSTISCH */
+
+  $("goMittag").onclick = async () => {
+
+    const day = $("dayMittag").value;
+
+    status("Lettura dei dati Mittagstisch...");
+
+    try{
+
+      const targetUrl = $("urlMittag").value.trim();
+
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
+      const j = await r.json();
+
+      if(j.error) throw new Error(j.error);
+
+      const dishes = parseMittagstisch(j.text,day);
+
+      if(!dishes.length){
+
+        status("Nessun piatto per " + day + " trovato sul sito.",true);
+        return;
+      }
+
+      renderMittag(day,dishes);
+
+    }catch(e){
+
+      status("Errore: " + e.message,true);
+    }
+  };
+
+  /* LETTURA SITO EMPFEHLUNGSKARTE */
+
+  $("goEmpf").onclick = async () => {
+
+    status("Lettura dei dati Empfehlungskarte...");
+
+    try{
+
+      const targetUrl = $("urlEmpf").value.trim();
+
+      const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
+      const j = await r.json();
+
+      if(j.error) throw new Error(j.error);
+
+      const dishes = parseEmpfehlungskarte(j.text);
+
+      if(!dishes.length){
+
+        status("Nessun piatto trovato.",true);
+        return;
+      }
+
+      renderEmpfehlung(dishes);
+
+    }catch(e){
+
+      status("Errore: " + e.message,true);
+    }
+  };
+
+  /* TESTO INCOLLATO MANUALMENTE */
+
+  $("usePaste").onclick = () => {
+
+    const pasteContent = $("paste").value;
+
+    if(selectedMenuType === "mittag"){
+
+      const day = $("dayMittag").value;
+      const dishes = parseMittagstisch(pasteContent,day);
+
+      if(!dishes.length){
+
+        status("Nessun piatto Mittagstisch nel testo.",true);
+        return;
+      }
+
+      renderMittag(day,dishes);
+
+    }else{
+
+      const dishes = parseEmpfehlungskarte(pasteContent);
+
+      if(!dishes.length){
+
+        status("Nessun piatto speciale nel testo.",true);
+        return;
+      }
+
+      renderEmpfehlung(dishes);
+    }
+  };
+
+  /* SALVATAGGIO FILE */
+
+  async function saveFile(blob,name){
+
+    const file = new File(
+      [blob],
+      name,
+      {type:blob.type}
+    );
+
+    if(
+      navigator.canShare &&
+      navigator.canShare({files:[file]})
+    ){
+
+      try{
+
+        await navigator.share({
+          files:[file],
+          title:name
+        });
+
+        return;
+
+      }catch(e){
+
+        if(e.name === "AbortError") return;
+      }
+    }
+
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  const stamp = () => new Date().toISOString().slice(0,10);
+
+  /* ESPORTAZIONE FOTO */
+
+  $("photo").onclick = async () => {
+
+    status("Generazione dell'immagine...");
+
+    try{
+
+      await document.fonts.ready;
+
+      const canvas = await html2canvas($("sheet"),{
+        useCORS:true,
+        backgroundColor:"#ffffff",
+        scale:2
+      });
+
+      canvas.toBlob(async blob => {
+
+        const titleName = selectedMenuType === "mittag"
+          ? "Mittagstisch"
+          : "Empfehlungskarte";
+
+        await saveFile(
+          blob,
           titleName + "_" + stamp() + ".png"
         );
 
         status("Immagine salvata!");
 
-      }, "image/png");
+      },"image/png");
 
-    } catch (e) {
+    }catch(e){
 
-      status("Errore: " + e.message, true);
-
+      status("Errore: " + e.message,true);
     }
-
   };
 
-
-  /* =========================================
-     SALVA COME PDF
-     ========================================= */
+  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA PER EMPFEHLUNGSKARTE */
 
   $("pdf").onclick = async () => {
 
     status("Generazione del PDF...");
 
-    try {
+    try{
 
       await document.fonts.ready;
 
-      const { PDFDocument } = PDFLib;
-
+      const {PDFDocument} = PDFLib;
       const pdfDoc = await PDFDocument.create();
 
       const a4Width = 595.28;
-
       const a4Height = 841.89;
 
-      const titleText =
-        selectedMenuType === "mittag"
-          ? "Mittagstisch"
-          : "Empfehlungskarte";
+      const titleText = selectedMenuType === "mittag"
+        ? "Mittagstisch"
+        : "Empfehlungskarte";
 
-      const subtitleText =
-        selectedMenuType === "mittag"
-          ? "TAGESGERICHTE"
-          : "EMPFEHLUNGEN";
+      const subtitleText = selectedMenuType === "mittag"
+        ? "TAGESGERICHTE"
+        : "EMPFEHLUNGEN";
 
       const dayText = $("sheetDay").textContent;
 
-      const elements = Array.from(
-        $("dishes").children
-      );
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "absolute";
+      tempContainer.style.top = "-9999px";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.width = "500px";
+      document.body.appendChild(tempContainer);
 
-      let pagesContent = [[]];
-
-      let currentPageIdx = 0;
-
-      let currentHeightEstimate = 0;
-
-      const maxHeightLimit =
-        selectedMenuType === "mittag"
-          ? 620
-          : 420;
-
-      elements.forEach((el) => {
-
-        let elHeight = el.offsetHeight || 30;
-
-        if (el.className === "category-title") {
-          elHeight += 15;
-        }
-
-        if (
-          currentHeightEstimate + elHeight > maxHeightLimit &&
-          pagesContent[currentPageIdx].length > 0
-        ) {
-
-          currentPageIdx++;
-
-          pagesContent[currentPageIdx] = [];
-
-          currentHeightEstimate = 0;
-
-        }
-
-        pagesContent[currentPageIdx].push(el);
-
-        currentHeightEstimate += elHeight;
-
-      });
-
-
-      /* GENERAZIONE PAGINE PDF */
-
-      for (let p = 0; p < pagesContent.length; p++) {
-
-        const tempContainer = document.createElement("div");
-
-        tempContainer.style.position = "absolute";
-
-        tempContainer.style.top = "-9999px";
-
-        tempContainer.style.left = "-9999px";
-
-        tempContainer.style.width = "500px";
-
-        document.body.appendChild(tempContainer);
-
+      if (selectedMenuType === "mittag") {
 
         const cloneSheet = $("sheet").cloneNode(true);
-
-        /* FLEX ANCHE NEL PDF */
-
         cloneSheet.style.display = "flex";
-
         cloneSheet.style.flexDirection = "column";
-
+        cloneSheet.style.width = "500px";
         cloneSheet.style.minHeight = "720px";
-
-
-        if (selectedMenuType === "empfehlung") {
-
-          cloneSheet.classList.add("empf-pdf-compact");
-
-        }
+        cloneSheet.style.height = "720px";
+        cloneSheet.style.margin = "0";
+        cloneSheet.style.boxShadow = "none";
 
         tempContainer.appendChild(cloneSheet);
 
-
         const dishesDiv = cloneSheet.querySelector("#dishes");
-
         dishesDiv.innerHTML = "";
-
-
         cloneSheet.querySelector("#sheetTitle").textContent = titleText;
-
         cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        cloneSheet.querySelector("#sheetDay").style.display = "block";
+        cloneSheet.querySelector("#sheetDay").textContent = dayText;
 
-
-        if (selectedMenuType === "empfehlung") {
-
-          cloneSheet.querySelector("#sheetDay").style.display = "none";
-
-        } else {
-
-          cloneSheet.querySelector("#sheetDay").style.display = "block";
-
-          cloneSheet.querySelector("#sheetDay").textContent = dayText;
-
-        }
-
-
-        pagesContent[p].forEach(el => {
-
+        Array.from($("dishes").children).forEach(el => {
           dishesDiv.appendChild(el.cloneNode(true));
-
         });
 
-
-        /* ESPORTAZIONE IMMAGINE DEL FOGLIO */
+        await new Promise(resolve => requestAnimationFrame(resolve));
 
         const canvas = await html2canvas(cloneSheet, {
-
           useCORS: true,
-
           backgroundColor: "#ffffff",
-
           scale: 2
-
         });
-
-
-        tempContainer.remove();
-
 
         const imgData = canvas.toDataURL("image/png");
-
-        const page = pdfDoc.addPage([
-          a4Width,
-          a4Height
-        ]);
-
+        const page = pdfDoc.addPage([a4Width, a4Height]);
         const pngImage = await pdfDoc.embedPng(imgData);
 
-
-        const margin = 20;
-
-        const maxWidth = a4Width - (margin * 2);
-
-        const maxHeight = a4Height - (margin * 2);
-
+        const margin = 12;
+        const maxWidth = a4Width - margin * 2;
+        const maxHeight = a4Height - margin * 2;
 
         let finalWidth = maxWidth;
-
-        let finalHeight =
-          (canvas.height * finalWidth) / canvas.width;
-
+        let finalHeight = canvas.height * finalWidth / canvas.width;
 
         if (finalHeight > maxHeight) {
-
           finalHeight = maxHeight;
-
-          finalWidth =
-            (canvas.width * finalHeight) / canvas.height;
-
+          finalWidth = canvas.width * finalHeight / canvas.height;
         }
 
-
         const xPos = (a4Width - finalWidth) / 2;
-
         const yPos = (a4Height - finalHeight) / 2;
 
-
         page.drawImage(pngImage, {
-
           x: xPos,
-
           y: yPos,
-
           width: finalWidth,
-
           height: finalHeight
-
         });
 
+      } else {
+
+        const items = Array.from($("dishes").children);
+        
+        const baseSheet = $("sheet").cloneNode(true);
+        baseSheet.style.display = "flex";
+        baseSheet.style.flexDirection = "column";
+        baseSheet.style.width = "500px";
+        baseSheet.style.minHeight = "720px";
+        baseSheet.style.height = "720px";
+        baseSheet.style.margin = "0";
+        baseSheet.style.boxShadow = "none";
+        baseSheet.classList.add("empf-pdf-compact");
+
+        const baseDishes = baseSheet.querySelector("#dishes");
+        baseDishes.innerHTML = "";
+        baseSheet.querySelector("#sheetTitle").textContent = titleText;
+        baseSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        baseSheet.querySelector("#sheetDay").style.display = "none";
+
+        tempContainer.appendChild(baseSheet);
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const innerContainer = baseSheet.querySelector(".inner");
+        const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
+                            baseSheet.querySelector("#sheetSubtitle").offsetHeight + 20;
+        const maxContentHeight = innerContainer.clientHeight - headerSpace;
+
+        tempContainer.removeChild(baseSheet);
+
+        let currentPageItems = [];
+        let currentHeight = 0;
+        const pages = [];
+
+        for (let i = 0; i < items.length; i++) {
+          const cloneItem = items[i].cloneNode(true);
+          
+          const measureDiv = document.createElement("div");
+          measureDiv.style.width = "450px";
+          measureDiv.appendChild(cloneItem);
+          tempContainer.appendChild(measureDiv);
+          const itemHeight = measureDiv.offsetHeight + 10;
+          tempContainer.removeChild(measureDiv);
+
+          if (currentHeight + itemHeight > maxContentHeight && currentPageItems.length > 0) {
+            pages.push(currentPageItems);
+            currentPageItems = [items[i]];
+            currentHeight = itemHeight;
+          } else {
+            currentPageItems.push(items[i]);
+            currentHeight += itemHeight;
+          }
+        }
+
+        if (currentPageItems.length > 0) {
+          pages.push(currentPageItems);
+        }
+
+        for (let p = 0; p < pages.length; p++) {
+          const pageSheet = $("sheet").cloneNode(true);
+          pageSheet.style.display = "flex";
+          pageSheet.style.flexDirection = "column";
+          pageSheet.style.width = "500px";
+          pageSheet.style.minHeight = "720px";
+          pageSheet.style.height = "720px";
+          pageSheet.style.margin = "0";
+          pageSheet.style.boxShadow = "none";
+          pageSheet.classList.add("empf-pdf-compact");
+
+          const dishesDiv = pageSheet.querySelector("#dishes");
+          dishesDiv.innerHTML = "";
+
+          pageSheet.querySelector("#sheetTitle").textContent = titleText;
+          pageSheet.querySelector("#sheetSubtitle").textContent = pages.length > 1 
+            ? `${subtitleText} (${p + 1}/${pages.length})` 
+            : subtitleText;
+          pageSheet.querySelector("#sheetDay").style.display = "none";
+
+          pages[p].forEach(el => {
+            dishesDiv.appendChild(el.cloneNode(true));
+          });
+
+          tempContainer.appendChild(pageSheet);
+          await new Promise(resolve => requestAnimationFrame(resolve));
+
+          const canvas = await html2canvas(pageSheet, {
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            scale: 2
+          });
+
+          tempContainer.removeChild(pageSheet);
+
+          const imgData = canvas.toDataURL("image/png");
+          const page = pdfDoc.addPage([a4Width, a4Height]);
+          const pngImage = await pdfDoc.embedPng(imgData);
+
+          const margin = 12;
+          const maxWidth = a4Width - margin * 2;
+          const maxHeight = a4Height - margin * 2;
+
+          let finalWidth = maxWidth;
+          let finalHeight = canvas.height * finalWidth / canvas.width;
+
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = canvas.width * finalHeight / canvas.height;
+          }
+
+          const xPos = (a4Width - finalWidth) / 2;
+          const yPos = (a4Height - finalHeight) / 2;
+
+          page.drawImage(pngImage, {
+            x: xPos,
+            y: yPos,
+            width: finalWidth,
+            height: finalHeight
+          });
+        }
       }
 
-
-      /* SALVATAGGIO PDF */
+      tempContainer.remove();
 
       const pdfBytes = await pdfDoc.save();
 
       await saveFile(
-
-        new Blob(
-          [pdfBytes],
-          { type: "application/pdf" }
-        ),
-
+        new Blob([pdfBytes], {type: "application/pdf"}),
         titleText + "_" + stamp() + ".pdf"
-
       );
 
       status("PDF salvato con successo!");
 
-    } catch (e) {
+    }catch(e){
 
       status("Errore: " + e.message, true);
-
     }
-
   };
 
 }
-
 </script>
 
 </body>
