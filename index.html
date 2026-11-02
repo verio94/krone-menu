@@ -1165,7 +1165,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA CON CONTROLLO RIGOROSO DELLE CATEGORIE */
+  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA CON MARGINE DI SICUREZZA ANTISFORAMENTO */
 
   $("pdf").onclick = async () => {
 
@@ -1299,8 +1299,9 @@ if(typeof document !== "undefined"){
         const innerContainer = baseSheet.querySelector(".inner");
         const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
                             baseSheet.querySelector("#sheetSubtitle").offsetHeight + 15;
-        // Margine di sicurezza rigoroso per evitare che tocchi la banda inferiore
-        const maxContentHeight = innerContainer.clientHeight - headerSpace - 25;
+        
+        // Altezza massima consentita ridotta in modo da lasciare sempre ampio respiro prima della banda inferiore
+        const maxContentHeight = innerContainer.clientHeight - headerSpace - 65;
 
         tempContainer.removeChild(baseSheet);
 
@@ -1326,7 +1327,7 @@ if(typeof document !== "undefined"){
           if (group.header) {
             const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
             
-            // Se l'intestazione e il primo piatto non entrano nello spazio disponibile, chiudiamo la pagina
+            // Se l'intestazione e almeno il primo piatto non ci stanno in sicurezza, passiamo alla pagina nuova
             if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
               pages.push(currentPageElements);
               currentPageElements = [];
