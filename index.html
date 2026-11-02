@@ -243,6 +243,17 @@ summary{
          hue-rotate(8deg) brightness(85%) contrast(95%);
 }
 
+/* EMPFEHLUNGSKARTE: niente banda colorata e niente casetta in basso, solo la bandiera */
+
+#sheet.empf .botband{
+  background:transparent !important;
+  padding-top:0 !important;
+}
+
+#sheet.empf .botband img{
+  display:none !important;
+}
+
 .flag{
   display:flex;
   height:7px;
@@ -296,7 +307,7 @@ summary{
 /* PIATTI */
 
 .dish-wrapper{
-  padding:6px 0;
+  padding:5px 0;
   border-bottom:1px solid #e8e8e8;
 }
 
@@ -309,7 +320,7 @@ summary{
   justify-content:space-between;
   align-items:flex-start;
   gap:12px;
-  padding:3px 0;
+  padding:2px 0;
   font-size:14px;
   line-height:1.4;
   font-family:'Quicksand',sans-serif;
@@ -352,9 +363,9 @@ summary{
   color:var(--darkgold);
   font-size:15px;
   font-weight:700;
-  margin:24px 0 10px;
+  margin:14px 0 6px;
   border-bottom:1px dashed var(--o);
-  padding-bottom:6px;
+  padding-bottom:4px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
@@ -368,65 +379,89 @@ summary{
   margin-top:8px;
 }
 
-/* OTTIMIZZAZIONE PDF: EMPFEHLUNGSKARTE */
+/* STAMPA A4 */
 
-.empf-pdf-compact .topband{
-  padding:8px 0 !important;
-}
+@media print{
 
-.empf-pdf-compact .topband img{
-  width:32% !important;
-  filter: none !important;
-}
+  @page{
+    size:A4;
+    margin:0;
+  }
 
-.empf-pdf-compact .inner{
-  padding:10px 25px 4px !important;
-}
+  html,body{
+    margin:0;
+    padding:0;
+    background:#fff;
+  }
 
-.empf-pdf-compact .title{
-  font-size:26px !important;
-  margin-bottom:2px !important;
-}
+  body{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
 
-.empf-pdf-compact .sub{
-  padding-bottom:5px !important;
-  margin-bottom:6px !important;
-}
+  main>*:not(#sheet),
+  .hint{
+    display:none!important;
+  }
 
-.empf-pdf-compact .category-title{
-  font-size:13.5px !important;
-  margin:18px 0 8px !important;
-  padding-bottom:4px !important;
-}
+  main{
+    padding:0;
+    max-width:none;
+    margin:0;
+  }
 
-.empf-pdf-compact .dish-wrapper{
-  padding:3px 0 !important;
-}
+  #sheet{
+    display:flex!important;
+    flex-direction:column;
+    width:210mm;
+    height:297mm;
+    min-height:297mm;
+    max-width:none;
+    box-shadow:none;
+    margin:0;
+    border-radius:0;
+    overflow:hidden;
+    page-break-after:avoid;
+    break-after:avoid;
+  }
 
-.empf-pdf-compact .dish{
-  font-size:12px !important;
-  line-height:1.25 !important;
-  padding:1px 0 !important;
-}
+  .topband{
+    height:45mm;
+    min-height:45mm;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--gband)!important;
+  }
 
-.empf-pdf-compact .dish .n,
-.empf-pdf-compact .dish .p{
-  font-size:12px !important;
-}
+  .topband img{
+    height:35mm;
+    width:auto;
+  }
 
-.empf-pdf-compact .desc{
-  font-size:9px !important;
-  line-height:1.25 !important;
-  margin-top:0.5px !important;
-}
+  .inner{
+    flex:1;
+    min-height:0;
+    padding:5mm 15mm 2mm;
+  }
 
-.empf-pdf-compact .botband{
-  margin-top:auto !important;
-  padding-top:5px !important;
-}
+  .botband{
+    margin-top:auto;
+    height:auto;
+    padding-top:0;
+    background:var(--gband)!important;
+    flex-shrink:0;
+  }
 
-.empf-pdf-compact .botband img{
-  width:45% !important;
+  #sheet.empf .botband{
+    background:transparent!important;
+  }
+
+  .flag{
+    height:2.8mm;
+    flex:none;
+  }
 }
 </style>
 </head>
@@ -486,7 +521,7 @@ summary{
       <img src="logo_t.png" alt="KRONE">
     </div>
 
-    <div class="inner">
+    <div class="inner" id="sheetInner">
 
       <div class="title" id="sheetTitle">Mittagstisch</div>
       <div class="sub" id="sheetSubtitle">TAGESGERICHTE</div>
@@ -495,8 +530,8 @@ summary{
 
     </div>
 
-    <div class="botband">
-      <img src="foot_t.png" alt="">
+    <div class="botband" id="sheetBotBand">
+      <img src="foot_t.png" alt="" id="sheetBotImg">
       <div class="flag">
         <i></i><i></i><i></i>
       </div>
@@ -775,8 +810,18 @@ if(typeof document !== "undefined"){
 
   function renderMittag(day,dishes){
 
+    // Mittagstisch: banda e casetta restano
+    $("sheet").classList.remove("empf");
+
     $("sheetDay").style.display = "block";
     $("sheetDay").textContent = day;
+
+    const inner = $("sheetInner");
+    inner.style.transform = "none";
+    inner.style.transformOrigin = "top center";
+
+    $("sheetBotBand").style.background = "";
+    $("sheetBotImg").style.display = "block";
 
     $("dishes").innerHTML = "";
 
@@ -808,7 +853,13 @@ if(typeof document !== "undefined"){
 
   function renderEmpfehlung(dishes){
 
+    // Empfehlungskarte: niente banda colorata e niente casetta, solo la bandiera
+    $("sheet").classList.add("empf");
+
     $("sheetDay").style.display = "none";
+
+    $("sheetBotBand").style.background = "transparent";
+    $("sheetBotImg").style.display = "none";
 
     const container = $("dishes");
 
@@ -857,7 +908,23 @@ if(typeof document !== "undefined"){
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
 
-    status("Generato: " + dishes.length + " elementi.");
+    const inner = $("sheetInner");
+    inner.style.transform = "none";
+
+    requestAnimationFrame(() => {
+      const availableHeight = 580;
+      const currentHeight = inner.scrollHeight;
+
+      if (currentHeight > availableHeight) {
+        const scaleFactor = Math.max(0.6, availableHeight / currentHeight);
+        inner.style.transform = `scale(${scaleFactor})`;
+        inner.style.transformOrigin = "top center";
+      } else {
+        inner.style.transform = "none";
+      }
+    });
+
+    status("Generato: " + dishes.length + " elementi in una singola pagina.");
 
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
@@ -1001,7 +1068,7 @@ if(typeof document !== "undefined"){
 
   const stamp = () => new Date().toISOString().slice(0,10);
 
-  /* ESPORTAZIONE FOTO A LARGHEZZA PIENA (100%) */
+  /* ESPORTAZIONE FOTO */
 
   $("photo").onclick = async () => {
 
@@ -1038,11 +1105,11 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF CON LARGHEZZA TOTALMENTE PIENA (BORDO A BORDO) */
+  /* ESPORTAZIONE PDF */
 
   $("pdf").onclick = async () => {
 
-    status("Generazione del PDF a larghezza totale...");
+    status("Generazione del PDF in pagina unica...");
 
     try{
 
@@ -1054,15 +1121,36 @@ if(typeof document !== "undefined"){
       const a4Width = 595.28;
       const a4Height = 841.89;
 
-      const titleText = selectedMenuType === "mittag"
-        ? "Mittagstisch"
-        : "Empfehlungskarte";
+      const cloneSheet = $("sheet").cloneNode(true);
+      cloneSheet.style.display = "flex";
+      cloneSheet.style.flexDirection = "column";
+      cloneSheet.style.width = "500px";
+      cloneSheet.style.minHeight = "720px";
+      cloneSheet.style.height = "720px";
+      cloneSheet.style.margin = "0";
+      cloneSheet.style.boxShadow = "none";
 
-      const subtitleText = selectedMenuType === "mittag"
-        ? "TAGESGERICHTE"
-        : "EMPFEHLUNGEN";
+      const innerClone = cloneSheet.querySelector("#sheetInner");
+      const originalInner = $("sheetInner");
+      innerClone.style.transform = originalInner.style.transform;
+      innerClone.style.transformOrigin = "top center";
 
-      const dayText = $("sheetDay").textContent;
+      // Empfehlungskarte: via banda colorata e casetta, resta solo la bandiera
+      if(selectedMenuType === "empfehlung"){
+
+        cloneSheet.classList.add("empf");
+
+        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
+        if(botBandClone){
+          botBandClone.style.background = "transparent";
+          botBandClone.style.paddingTop = "0";
+        }
+
+        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
+        if(botImgClone){
+          botImgClone.remove();
+        }
+      }
 
       const tempContainer = document.createElement("div");
       tempContainer.style.position = "absolute";
@@ -1071,244 +1159,43 @@ if(typeof document !== "undefined"){
       tempContainer.style.width = "500px";
       document.body.appendChild(tempContainer);
 
-      if (selectedMenuType === "mittag") {
+      tempContainer.appendChild(cloneSheet);
 
-        const cloneSheet = $("sheet").cloneNode(true);
-        cloneSheet.style.display = "flex";
-        cloneSheet.style.flexDirection = "column";
-        cloneSheet.style.width = "500px";
-        cloneSheet.style.minHeight = "720px";
-        cloneSheet.style.height = "720px";
-        cloneSheet.style.margin = "0";
-        cloneSheet.style.boxShadow = "none";
+      await new Promise(resolve => requestAnimationFrame(resolve));
 
-        tempContainer.appendChild(cloneSheet);
-
-        const dishesDiv = cloneSheet.querySelector("#dishes");
-        dishesDiv.innerHTML = "";
-        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
-        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-        cloneSheet.querySelector("#sheetDay").style.display = "block";
-        cloneSheet.querySelector("#sheetDay").textContent = dayText;
-
-        Array.from($("dishes").children).forEach(el => {
-          dishesDiv.appendChild(el.cloneNode(true));
-        });
-
-        await new Promise(resolve => requestAnimationFrame(resolve));
-
-        const canvas = await html2canvas(cloneSheet, {
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          scale: 2
-        });
-
-        const imgData = canvas.toDataURL("image/png");
-        const page = pdfDoc.addPage([a4Width, a4Height]);
-        const pngImage = await pdfDoc.embedPng(imgData);
-
-        // LARGHEZZA AL 100% (Bordo a bordo): margin = 0 e larghezza impostata esattamente su a4Width
-        const margin = 0;
-        const maxWidth = a4Width - margin * 2;
-        const maxHeight = a4Height - 25; // Lascia solo un piccolo spazio in basso per la bandiera
-
-        let finalWidth = maxWidth;
-        let finalHeight = canvas.height * finalWidth / canvas.width;
-
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = canvas.width * finalHeight / canvas.height;
-        }
-
-        const xPos = 0; // Azzera i margini laterali
-        const yPos = a4Height - finalHeight; // Ancorato dall'alto verso il basso
-
-        page.drawImage(pngImage, {
-          x: xPos,
-          y: yPos,
-          width: finalWidth,
-          height: finalHeight
-        });
-
-      } else {
-
-        const rawItems = Array.from($("dishes").children);
-        
-        const groups = [];
-        let currentGroup = { header: null, elements: [] };
-
-        rawItems.forEach(el => {
-          if (el.classList.contains("category-title")) {
-            if (currentGroup.header || currentGroup.elements.length > 0) {
-              groups.push(currentGroup);
-            }
-            currentGroup = { header: el, elements: [] };
-          } else {
-            currentGroup.elements.push(el);
-          }
-        });
-        if (currentGroup.header || currentGroup.elements.length > 0) {
-          groups.push(currentGroup);
-        }
-
-        const baseSheet = $("sheet").cloneNode(true);
-        baseSheet.style.display = "flex";
-        baseSheet.style.flexDirection = "column";
-        baseSheet.style.width = "500px";
-        baseSheet.style.minHeight = "720px";
-        baseSheet.style.height = "720px";
-        baseSheet.style.margin = "0";
-        baseSheet.style.boxShadow = "none";
-        baseSheet.classList.add("empf-pdf-compact");
-
-        const baseDishes = baseSheet.querySelector("#dishes");
-        baseDishes.innerHTML = "";
-        baseSheet.querySelector("#sheetTitle").textContent = titleText;
-        baseSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-        baseSheet.querySelector("#sheetDay").style.display = "none";
-
-        tempContainer.appendChild(baseSheet);
-        await new Promise(resolve => requestAnimationFrame(resolve));
-
-        const innerContainer = baseSheet.querySelector(".inner");
-        const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
-                            baseSheet.querySelector("#sheetSubtitle").offsetHeight + 15;
-        
-        const maxContentHeight = innerContainer.clientHeight - headerSpace - 65;
-
-        tempContainer.removeChild(baseSheet);
-
-        let pages = [];
-        let currentPageElements = [];
-        let currentHeight = 0;
-
-        async function measureHeight(node) {
-          const mDiv = document.createElement("div");
-          mDiv.style.width = "450px";
-          mDiv.classList.add("empf-pdf-compact");
-          mDiv.appendChild(node.cloneNode(true));
-          tempContainer.appendChild(mDiv);
-          const h = mDiv.offsetHeight + 4;
-          tempContainer.removeChild(mDiv);
-          return h;
-        }
-
-        for (let g = 0; g < groups.length; g++) {
-          const group = groups[g];
-          let headerHeight = group.header ? await measureHeight(group.header) : 0;
-
-          if (group.header) {
-            const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
-            
-            if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
-              pages.push(currentPageElements);
-              currentPageElements = [];
-              currentHeight = 0;
-            }
-
-            currentPageElements.push(group.header);
-            currentHeight += headerHeight;
-          }
-
-          for (let e = 0; e < group.elements.length; e++) {
-            const dish = group.elements[e];
-            const dishHeight = await measureHeight(dish);
-
-            if (currentHeight + dishHeight > maxContentHeight && currentPageElements.length > 0) {
-              const lastEl = currentPageElements[currentPageElements.length - 1];
-              if (lastEl && lastEl.classList.contains("category-title")) {
-                currentPageElements.pop();
-                pages.push(currentPageElements);
-                currentPageElements = [lastEl, dish];
-                currentHeight = headerHeight + dishHeight;
-              } else {
-                pages.push(currentPageElements);
-                currentPageElements = [dish];
-                currentHeight = dishHeight;
-              }
-            } else {
-              currentPageElements.push(dish);
-              currentHeight += dishHeight;
-            }
-          }
-        }
-
-        if (currentPageElements.length > 0) {
-          pages.push(currentPageElements);
-        }
-
-        for (let p = 0; p < pages.length; p++) {
-          const pageSheet = $("sheet").cloneNode(true);
-          pageSheet.style.display = "flex";
-          pageSheet.style.flexDirection = "column";
-          pageSheet.style.width = "500px";
-          pageSheet.style.minHeight = "720px";
-          pageSheet.style.height = "720px";
-          pageSheet.style.margin = "0";
-          pageSheet.style.boxShadow = "none";
-          pageSheet.classList.add("empf-pdf-compact");
-
-          const dishesDiv = pageSheet.querySelector("#dishes");
-          dishesDiv.innerHTML = "";
-
-          pageSheet.querySelector("#sheetTitle").textContent = titleText;
-          pageSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-          pageSheet.querySelector("#sheetDay").style.display = "none";
-
-          pages[p].forEach(el => {
-            dishesDiv.appendChild(el.cloneNode(true));
-          });
-
-          tempContainer.appendChild(pageSheet);
-          await new Promise(resolve => requestAnimationFrame(resolve));
-
-          const canvas = await html2canvas(pageSheet, {
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            scale: 2
-          });
-
-          tempContainer.removeChild(pageSheet);
-
-          const imgData = canvas.toDataURL("image/png");
-          const page = pdfDoc.addPage([a4Width, a4Height]);
-          const pngImage = await pdfDoc.embedPng(imgData);
-
-          // LARGHEZZA AL 100% (Bordo a bordo) anche per le pagine multiple
-          const margin = 0;
-          const maxWidth = a4Width - margin * 2;
-          const maxHeight = a4Height - 25;
-
-          let finalWidth = maxWidth;
-          let finalHeight = canvas.height * finalWidth / canvas.width;
-
-          if (finalHeight > maxHeight) {
-            finalHeight = maxHeight;
-            finalWidth = canvas.width * finalHeight / canvas.height;
-          }
-
-          const xPos = 0;
-          const yPos = a4Height - finalHeight;
-
-          page.drawImage(pngImage, {
-            x: xPos,
-            y: yPos,
-            width: finalWidth,
-            height: finalHeight
-          });
-        }
-      }
+      const canvas = await html2canvas(cloneSheet, {
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scale: 2
+      });
 
       tempContainer.remove();
+
+      const imgData = canvas.toDataURL("image/png");
+      const page = pdfDoc.addPage([a4Width, a4Height]);
+      const pngImage = await pdfDoc.embedPng(imgData);
+
+      const finalWidth = a4Width;
+      const finalHeight = canvas.height * finalWidth / canvas.width;
+
+      const xPos = 0;
+      const yPos = (a4Height - finalHeight) / 2;
+
+      page.drawImage(pngImage, {
+        x: xPos,
+        y: yPos,
+        width: finalWidth,
+        height: finalHeight
+      });
 
       const pdfBytes = await pdfDoc.save();
 
       await saveFile(
         new Blob([pdfBytes], {type: "application/pdf"}),
-        titleText + "_" + stamp() + ".pdf"
+        (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF a larghezza totale salvato con successo!");
+      status("PDF generato con successo in una sola pagina a piena larghezza!");
 
     }catch(e){
 
