@@ -222,7 +222,6 @@ summary{
   height:auto;
   display:block;
   margin:0 auto;
-  /* Logo pulito e nativo senza filtri alteranti */
   filter: none !important;
 }
 
@@ -353,7 +352,7 @@ summary{
   color:var(--darkgold);
   font-size:15px;
   font-weight:700;
-  margin:24px 0 10px; /* Spaziatura ben calibrata: né troppo stretta né esagerata */
+  margin:24px 0 10px;
   border-bottom:1px dashed var(--o);
   padding-bottom:6px;
   text-transform:uppercase;
@@ -396,7 +395,7 @@ summary{
 
 .empf-pdf-compact .category-title{
   font-size:13.5px !important;
-  margin:18px 0 8px !important; /* Spaziatura ottimizzata anche in versione PDF compatto */
+  margin:18px 0 8px !important;
   padding-bottom:4px !important;
 }
 
@@ -1166,7 +1165,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA CON CONTROLLO CATEGORIE ISOLATE */
+  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA CON CONTROLLO RIGOROSO DELLE CATEGORIE */
 
   $("pdf").onclick = async () => {
 
@@ -1300,7 +1299,8 @@ if(typeof document !== "undefined"){
         const innerContainer = baseSheet.querySelector(".inner");
         const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
                             baseSheet.querySelector("#sheetSubtitle").offsetHeight + 15;
-        const maxContentHeight = innerContainer.clientHeight - headerSpace + 10;
+        // Margine di sicurezza rigoroso per evitare che tocchi la banda inferiore
+        const maxContentHeight = innerContainer.clientHeight - headerSpace - 25;
 
         tempContainer.removeChild(baseSheet);
 
@@ -1326,6 +1326,7 @@ if(typeof document !== "undefined"){
           if (group.header) {
             const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
             
+            // Se l'intestazione e il primo piatto non entrano nello spazio disponibile, chiudiamo la pagina
             if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
               pages.push(currentPageElements);
               currentPageElements = [];
