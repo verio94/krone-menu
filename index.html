@@ -477,7 +477,7 @@ const CATEGORIES = [
 ];
 
 let selectedMenuType = "mittag";
-let currentParsedDishes = []; // Mantiene la lista strutturata per la generazione PDF
+let currentParsedDishes = [];
 
 /* PARSER MITTAGSTISCH */
 
@@ -916,7 +916,7 @@ if(typeof document !== "undefined"){
 
   const stamp = () => new Date().toISOString().slice(0,10);
 
-  /* ESPORTAZIONE FOTO (CATTURA HTML2CANVAS PER ANTEPRIMA VISIVA) */
+  /* ESPORTAZIONE FOTO */
 
   $("photo").onclick = async () => {
 
@@ -951,40 +951,41 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* NUOVO APPROCCIO: GENERAZIONE DIRETTA DEL PDF CON SCALA VETTORIALE DINAMICA */
+  /* GENERAZIONE PDF: LARGHEZZA TOTALMENTE PIENA, SENZA SPAZI LATERALI */
 
   $("pdf").onclick = async () => {
 
-    status("Generazione del PDF vettoriale perfetto...");
+    status("Generazione del PDF a larghezza totale...");
 
     try{
 
       await document.fonts.ready;
-
-      // Legge i piatti attualmente modificati a schermo per includere eventuali correzioni manuali
-      const dishNodes = document.querySelectorAll("#sheet .dish-wrapper, #sheet .dish");
-      const categoryNodes = document.querySelectorAll("#sheet .category-title");
-
-      // Cattura lo stato esatto del menù da stampare
-      const isEmpf = selectedMenuType === "empfehlung";
-      const titleText = $("sheetTitle").textContent;
-      const subText = $("sheetSubtitle").textContent;
-      const dayText = $("sheetDay").textContent;
-
-      // Generazione canvas ad alta risoluzione del foglio completo
       window.scrollTo(0, 0);
-      
+
+      const isEmpf = selectedMenuType === "empfehlung";
+      const originalBotBackground = $("sheetBotBand").style.background;
+      const originalBotImgDisplay = $("sheetBotImg").style.display;
+
+      if (isEmpf) {
+        $("sheetBotBand").style.background = "transparent";
+        $("sheetBotImg").style.display = "none";
+      }
+
       const canvas = await html2canvas($("sheet"), {
         useCORS: true,
         backgroundColor: "#ffffff",
-        scale: 3, // Alta risoluzione per testo nitido
+        scale: 3,
         scrollY: 0
       });
+
+      if (isEmpf) {
+        $("sheetBotBand").style.background = originalBotBackground;
+        $("sheetBotImg").style.display = originalBotImgDisplay;
+      }
 
       const { PDFDocument } = PDFLib;
       const pdfDoc = await PDFDocument.create();
 
-      // Dimensioni standard A4 (in punti): 595.28 x 841.89
       const pageW = 595.28;
       const pageH = 841.89;
       const page = pdfDoc.addPage([pageW, pageH]);
@@ -992,37 +993,32 @@ if(typeof document !== "undefined"){
       const imgData = canvas.toDataURL("image/png");
       const embeddedImg = await pdfDoc.embedPng(imgData);
 
-      // MARGINI DI SICUREZZA FONDAMENTALI
-      // Lasciamo 35 pt sui lati e un margine garantito in basso di 40 pt (~1.5 cm) per non tagliare mai la bandiera
-      const sideMargin = 35;
-      const topMargin = 25;
-      const bottomMargin = 40; 
+      // LARGHEZZA AL 100%: 0 margini laterali, sfrutta interamente i 595.28 punti di larghezza
+      const drawW = pageW; 
+      const drawH = (canvas.height * drawW) / canvas.width;
 
-      const availableW = pageW - (sideMargin * 2);
-      const availableH = pageH - topMargin - bottomMargin;
+      // Margine di sicurezza inferiore fisso di 40 punti (~1.5 cm) per preservare la bandiera italiana
+      const bottomMargin = 40;
+      const availableH = pageH - bottomMargin;
 
-      // Calcola le proporzioni esatte senza alterare l'aspect ratio
-      const imgW = canvas.width;
-      const imgH = canvas.height;
+      let finalW = drawW;
+      let finalH = drawH;
 
-      let drawW = availableW;
-      let drawH = (imgH * availableW) / imgW;
-
-      // Se l'altezza supera lo spazio utile A4, riduciamo in proporzione mantenendo intatti i bordi
-      if (drawH > availableH) {
-        drawH = availableH;
-        drawW = (imgW * availableH) / imgH;
+      // Se l'altezza dovesse eccedere lo spazio utile, riproporziona mantenendo la piena larghezza
+      if (finalH > availableH) {
+        finalH = availableH;
+        finalW = (canvas.width * finalH) / canvas.height;
       }
 
-      // Centriamo l'immagine orizzontalmente ed entriamo esattamente nello spazio A4 verticalmente
-      const xPos = (pageW - drawW) / 2;
-      const yPos = pageH - topMargin - drawH; // Disegna dall'alto verso il basso lasciando il margine fisso in basso
+      // Posizionamento: x = 0 (nessuno spazio a sinistra o a destra), y calcolata dal basso con margine sicuro
+      const xPos = (pageW - finalW) / 2; // se finalW è esattamente pageW, xPos sarà 0
+      const yPos = pageH - finalH;
 
       page.drawImage(embeddedImg, {
         x: xPos,
         y: yPos,
-        width: drawW,
-        height: drawH
+        width: finalW,
+        height: finalH
       });
 
       const pdfBytes = await pdfDoc.save();
@@ -1032,7 +1028,7 @@ if(typeof document !== "undefined"){
         (isEmpf ? "Empfehlungskarte" : "Mittagstisch") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF A4 generato con successo in pagina unica con margine garantito!");
+      status("PDF generato a larghezza totale con successo!");
 
     }catch(e){
       status("Errore PDF: " + e.message, true);
