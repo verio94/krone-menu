@@ -46,12 +46,12 @@
   .quick-links a{display:inline-block;margin-right:15px;color:var(--g);text-decoration:none;font-size:13px;font-weight:700;border-bottom:1px solid var(--o);padding-bottom:1px}
   .quick-links a:hover{color:var(--o)}
 
-  /* 🖥️ Foglio del Menù (Bande impostate su sfondo bianco puro) */
+  /* 🖥️ Foglio del Menù (Bande e loghi sensibilmente ridotti) */
   #sheet{display:none;background:#fff;margin-top:16px;border-radius:6px;box-shadow:0 2px 10px #0002;overflow:hidden;width:100%;max-width:500px;margin-left:auto;margin-right:auto}
-  .topband{background:#ffffff;padding:8px 0;text-align:center;border-bottom:1px solid #eee}
-  .topband img{width:32%;height:auto;display:block;margin:0 auto;filter: brightness(0.2); /* Mantiene i dettagli del logo ben visibili */}
-  .botband{background:#ffffff;margin-top:12px;padding-top:6px;border-top:1px solid #eee}
-  .botband img{width:48%;height:auto;display:block;margin:0 auto;filter: brightness(0.2); /* Mantiene i dettagli del disegno ben visibili */}
+  .topband{background:#073334;padding:8px 0;text-align:center}
+  .topband img{width:32%;height:auto;display:block;margin:0 auto}
+  .botband{background:#073334;margin-top:12px;padding-top:6px}
+  .botband img{width:48%;height:auto;display:block;margin:0 auto}
   .flag{display:flex;height:5px}.flag i{flex:1}
   .flag i:nth-child(1){background:#295E28}.flag i:nth-child(2){background:#ECE6D5}.flag i:nth-child(3){background:#B60D08}
   .inner{padding:15px 22px 4px}
@@ -92,10 +92,10 @@
     body{background:#fff}header,main>\*:not(#sheet),.hint{display:none!important}
     main{padding:0;max-width:none}
     #sheet{display:flex!important;flex-direction:column;width:210mm;min-height:297mm;box-shadow:none;margin:0;border-radius:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    .topband{height:30mm;padding:0;display:flex;align-items:center;justify-content:center;background:#ffffff !important}
-    .topband img{height:22mm;width:auto;filter: brightness(0.2) !important}
-    .botband{margin-top:auto;height:50mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end;background:#ffffff !important}
-    .botband img{width:90mm;margin-bottom:auto;margin-top:auto;filter: brightness(0.2) !important}
+    .topband{height:30mm;padding:0;display:flex;align-items:center;justify-content:center}
+    .topband img{height:22mm;width:auto}
+    .botband{margin-top:auto;height:50mm;padding-top:0;display:flex;flex-direction:column;justify-content:flex-end}
+    .botband img{width:90mm;margin-bottom:auto;margin-top:auto}
     .flag{height:2mm;flex:none}
     .inner{padding:6mm 16mm 0}
     .title{font-size:32px;font-weight:400;font-family:'Quicksand',sans-serif}
@@ -293,7 +293,6 @@ if (typeof document !== "undefined") {
 
   // Rendering a schermo
   function renderMittag(day, dishes) {
-    $("sheetDay").style.display = "block";
     $("sheetDay").textContent = day;
     $("dishes").innerHTML = "";
     dishes.forEach(([n, p]) => {
@@ -311,12 +310,13 @@ if (typeof document !== "undefined") {
   }
 
   function renderEmpfehlung(dishes) {
-    $("sheetDay").style.display = "none";
+    $("sheetDay").textContent = "Unsere Empfehlungen";
     const container = $("dishes");
     container.innerHTML = "";
     
     let lastCat = "";
     dishes.forEach(dish => {
+      // ⚡ Rimosso il blocco duplicato del titolo jolly "Empfehlungen" se coincide con l'intestazione principale
       if (dish.category && dish.category !== lastCat && dish.category.toLowerCase() !== "empfehlungen") {
         const catHeader = document.createElement("div");
         catHeader.className = "category-title";
@@ -425,7 +425,7 @@ if (typeof document !== "undefined") {
     } catch (e) { status("Errore: " + e.message, true); }
   };
 
-  // 📄 FUNZIONE: Salva PDF (In bianco puro ed ecologico)
+  // 📄 FUNZIONE: Salva PDF (Senza scritte delle pagine, bande verdi e loghi compattati al massimo)
   $("pdf").onclick = async () => {
     status("Generazione del PDF...");
     try {
@@ -482,13 +482,7 @@ if (typeof document !== "undefined") {
         
         cloneSheet.querySelector("#sheetTitle").textContent = titleText;
         cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
-        
-        if (selectedMenuType === "empfehlung") {
-          cloneSheet.querySelector("#sheetDay").style.display = "none";
-        } else {
-          cloneSheet.querySelector("#sheetDay").style.display = "block";
-          cloneSheet.querySelector("#sheetDay").textContent = dayText;
-        }
+        cloneSheet.querySelector("#sheetDay").textContent = dayText;
         
         pagesContent[p].forEach(el => {
           dishesDiv.appendChild(el.cloneNode(true));
