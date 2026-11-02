@@ -222,7 +222,6 @@ summary{
   height:auto;
   display:block;
   margin:0 auto;
-  /* Converte il logo interamente nel colore oro --o (#C9A227) sia a schermo che nel canvas/pdf */
   filter: brightness(0) saturate(100%) invert(67%) sepia(48%) saturate(542%) hue-rotate(5deg) brightness(95%) contrast(88%);
 }
 
@@ -369,7 +368,7 @@ summary{
   margin-top:8px;
 }
 
-/* OTTIMIZZAZIONE PDF: EMPFEHLUNGSKARTE (Spazi ottimizzati per evitare tagli indesiderati) */
+/* OTTIMIZZAZIONE PDF: EMPFEHLUNGSKARTE */
 
 .empf-pdf-compact .topband{
   padding:8px 0 !important;
@@ -1166,7 +1165,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA OTTIMIZZATA */
+  /* ESPORTAZIONE PDF: PAGINAZIONE DINAMICA CON CONTROLLO CATEGORIE ISOLATE */
 
   $("pdf").onclick = async () => {
 
@@ -1259,8 +1258,26 @@ if(typeof document !== "undefined"){
 
       } else {
 
-        const items = Array.from($("dishes").children);
+        const rawItems = Array.from($("dishes").children);
         
+        // Raggruppiamo logicamente i titoli di categoria insieme ai rispettivi piatti
+        const groups = [];
+        let currentGroup = { header: null, elements: [] };
+
+        rawItems.forEach(el => {
+          if (el.classList.contains("category-title")) {
+            if (currentGroup.header || currentGroup.elements.length > 0) {
+              groups.push(currentGroup);
+            }
+            currentGroup = { header: el, elements: [] };
+          } else {
+            currentGroup.elements.push(el);
+          }
+        });
+        if (currentGroup.header || currentGroup.elements.length > 0) {
+          groups.push(currentGroup);
+        }
+
         const baseSheet = $("sheet").cloneNode(true);
         baseSheet.style.display = "flex";
         baseSheet.style.flexDirection = "column";
@@ -1283,40 +1300,76 @@ if(typeof document !== "undefined"){
         const innerContainer = baseSheet.querySelector(".inner");
         const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
                             baseSheet.querySelector("#sheetSubtitle").offsetHeight + 15;
-        // Margine di tolleranza leggermente aumentato per evitare overflow imprevisti
-        const maxContentHeight = innerContainer.clientHeight - headerSpace + 15;
+        const maxContentHeight = innerContainer.clientHeight - headerSpace + 10;
 
         tempContainer.removeChild(baseSheet);
 
-        let currentPageItems = [];
+        let pages = [];
+        let currentPageElements = [];
         let currentHeight = 0;
-        const pages = [];
 
-        for (let i = 0; i < items.length; i++) {
-          const cloneItem = items[i].cloneNode(true);
-          
-          const measureDiv = document.createElement("div");
-          measureDiv.style.width = "450px";
-          measureDiv.classList.add("empf-pdf-compact");
-          measureDiv.appendChild(cloneItem);
-          tempContainer.appendChild(measureDiv);
-          const itemHeight = measureDiv.offsetHeight + 4;
-          tempContainer.removeChild(measureDiv);
+        // Funzione di supporto per misurare l'altezza di un elemento HTML
+        async function measureHeight(node) {
+          const mDiv = document.createElement("div");
+          mDiv.style.width = "450px";
+          mDiv.classList.add("empf-pdf-compact");
+          mDiv.appendChild(node.cloneNode(true));
+          tempContainer.appendChild(mDiv);
+          const h = mDiv.offsetHeight + 4;
+          tempContainer.removeChild(mDiv);
+          return h;
+        }
 
-          if (currentHeight + itemHeight > maxContentHeight && currentPageItems.length > 0) {
-            pages.push(currentPageItems);
-            currentPageItems = [items[i]];
-            currentHeight = itemHeight;
-          } else {
-            currentPageItems.push(items[i]);
-            currentHeight += itemHeight;
+        for (let g = 0; g < groups.length; g++) {
+          const group = groups[g];
+          let headerHeight = group.header ? await measureHeight(group.header) : 0;
+
+          // Se c'è un'intestazione di categoria, verifichiamo se ci sta insieme ad almeno il primo piatto
+          if (group.header) {
+            const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
+            
+            // Se non c'abbastanza spazio per l'intestazione + il primo piatto, chiudiamo la pagina corrente
+            if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
+              pages.push(currentPageElements);
+              currentPageElements = [];
+              currentHeight = 0;
+            }
+
+            currentPageElements.push(group.header);
+            currentHeight += headerHeight;
+          }
+
+          // Inseriamo i piatti del gruppo uno ad uno
+          for (let e = 0; e < group.elements.length; e++) {
+            const dish = group.elements[e];
+            const dishHeight = await measureHeight(dish);
+
+            if (currentHeight + dishHeight > maxContentHeight && currentPageElements.length > 0) {
+              // Prima di spezzare, controlliamo se l'ultimo elemento rimasto nella pagina corrente è rimasto un titolo di categoria isolato
+              const lastEl = currentPageElements[currentPageElements.length - 1];
+              if (lastEl && lastEl.classList.contains("category-title")) {
+                // Spostiamo anche il titolo nella pagina nuova
+                currentPageElements.pop();
+                pages.push(currentPageElements);
+                currentPageElements = [lastEl, dish];
+                currentHeight = headerHeight + dishHeight;
+              } else {
+                pages.push(currentPageElements);
+                currentPageElements = [dish];
+                currentHeight = dishHeight;
+              }
+            } else {
+              currentPageElements.push(dish);
+              currentHeight += dishHeight;
+            }
           }
         }
 
-        if (currentPageItems.length > 0) {
-          pages.push(currentPageItems);
+        if (currentPageElements.length > 0) {
+          pages.push(currentPageElements);
         }
 
+        // Renderizziamo ogni pagina nel documento PDF finale
         for (let p = 0; p < pages.length; p++) {
           const pageSheet = $("sheet").cloneNode(true);
           pageSheet.style.display = "flex";
