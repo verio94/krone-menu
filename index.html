@@ -58,9 +58,9 @@ header h1{
 }
 
 main{
-  max-width:100%;
+  max-width:640px;
   margin:0 auto;
-  padding:15px 8px;
+  padding:20px 14px;
 }
 
 label{
@@ -192,26 +192,26 @@ summary{
 
 .quick-links a:hover{color:var(--o)}
 
-/* FOGLIO MENU: ORA ALLARGATO AL 100% DI LARGHEZZA, SENZA LIMITI FISSI */
+/* FOGLIO MENU */
 
 #sheet{
   display:none;
   flex-direction:column;
+  min-height:720px;
   background:#fff;
   margin-top:16px;
-  border-radius:0;
+  border-radius:6px;
   box-shadow:0 2px 10px #0002;
   overflow:hidden;
-  width:100% !important;
-  max-width:100% !important;
-  min-height:841px;
-  margin-left:0;
-  margin-right:0;
+  width:100%;
+  max-width:500px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 .topband{
   background:var(--gband);
-  padding:30px 0;
+  padding:14px 0;
   text-align:center;
   width:100%;
   flex-shrink:0;
@@ -228,13 +228,13 @@ summary{
 .botband{
   background:var(--gband);
   margin-top:auto;
-  padding-top:18px;
+  padding-top:12px;
   width:100%;
   flex-shrink:0;
 }
 
 .botband img{
-  width:55%;
+  width:60%;
   height:auto;
   display:block;
   margin:0 auto;
@@ -245,7 +245,7 @@ summary{
 
 .flag{
   display:flex;
-  height:10px;
+  height:7px;
   width:100%;
 }
 
@@ -254,10 +254,10 @@ summary{
 .flag i:nth-child(2){background:#ECE6D5}
 .flag i:nth-child(3){background:#B60D08}
 
-/* AREA TESTO ESPANSA */
+/* AREA TESTO */
 
 .inner{
-  padding:35px 55px 20px;
+  padding:19px 30px 10px;
   flex:1;
   min-height:0;
 }
@@ -265,38 +265,38 @@ summary{
 .title{
   text-align:center;
   color:var(--g);
-  font-size:40px;
+  font-size:32px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
   line-height:1.15;
-  margin:0 0 8px;
+  margin:0 0 4px;
 }
 
 .sub{
   text-align:center;
   color:var(--o);
   letter-spacing:.3em;
-  font-size:13px;
+  font-size:11px;
   font-weight:700;
   font-family:'Quicksand',sans-serif;
-  padding-bottom:14px;
+  padding-bottom:11px;
   border-bottom:1px solid var(--o);
-  margin-bottom:18px;
+  margin-bottom:12px;
 }
 
 .day{
   text-align:center;
   color:var(--g);
-  font-size:28px;
+  font-size:23px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
-  margin:10px 0 12px;
+  margin:5px 0 7px;
 }
 
 /* PIATTI */
 
 .dish-wrapper{
-  padding:8px 0;
+  padding:6px 0;
   border-bottom:1px solid #e8e8e8;
 }
 
@@ -308,9 +308,9 @@ summary{
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
-  gap:18px;
-  padding:4px 0;
-  font-size:16px;
+  gap:12px;
+  padding:3px 0;
+  font-size:14px;
   line-height:1.4;
   font-family:'Quicksand',sans-serif;
 }
@@ -336,10 +336,10 @@ summary{
 }
 
 .desc{
-  font-size:12px;
+  font-size:10.5px;
   color:#666;
   font-style:italic;
-  margin-top:3px;
+  margin-top:2px;
   text-align:left;
   outline:none;
   font-family:'Quicksand',sans-serif;
@@ -350,11 +350,11 @@ summary{
 
 .category-title{
   color:var(--darkgold);
-  font-size:18px;
+  font-size:15px;
   font-weight:700;
-  margin:18px 0 8px;
+  margin:24px 0 10px;
   border-bottom:1px dashed var(--o);
-  padding-bottom:5px;
+  padding-bottom:6px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
@@ -366,6 +366,67 @@ summary{
   color:#777;
   text-align:center;
   margin-top:8px;
+}
+
+/* OTTIMIZZAZIONE PDF: EMPFEHLUNGSKARTE */
+
+.empf-pdf-compact .topband{
+  padding:8px 0 !important;
+}
+
+.empf-pdf-compact .topband img{
+  width:32% !important;
+  filter: none !important;
+}
+
+.empf-pdf-compact .inner{
+  padding:10px 25px 4px !important;
+}
+
+.empf-pdf-compact .title{
+  font-size:26px !important;
+  margin-bottom:2px !important;
+}
+
+.empf-pdf-compact .sub{
+  padding-bottom:5px !important;
+  margin-bottom:6px !important;
+}
+
+.empf-pdf-compact .category-title{
+  font-size:13.5px !important;
+  margin:18px 0 8px !important;
+  padding-bottom:4px !important;
+}
+
+.empf-pdf-compact .dish-wrapper{
+  padding:3px 0 !important;
+}
+
+.empf-pdf-compact .dish{
+  font-size:12px !important;
+  line-height:1.25 !important;
+  padding:1px 0 !important;
+}
+
+.empf-pdf-compact .dish .n,
+.empf-pdf-compact .dish .p{
+  font-size:12px !important;
+}
+
+.empf-pdf-compact .desc{
+  font-size:9px !important;
+  line-height:1.25 !important;
+  margin-top:0.5px !important;
+}
+
+.empf-pdf-compact .botband{
+  margin-top:auto !important;
+  padding-top:5px !important;
+}
+
+.empf-pdf-compact .botband img{
+  width:45% !important;
 }
 </style>
 </head>
@@ -417,7 +478,7 @@ summary{
 
   <div id="status"></div>
 
-  <!-- FOGLIO MENU A LARGHEZZA TOTALE -->
+  <!-- FOGLIO MENU -->
 
   <div id="sheet">
 
@@ -425,7 +486,7 @@ summary{
       <img src="logo_t.png" alt="KRONE">
     </div>
 
-    <div class="inner" id="sheetInner">
+    <div class="inner">
 
       <div class="title" id="sheetTitle">Mittagstisch</div>
       <div class="sub" id="sheetSubtitle">TAGESGERICHTE</div>
@@ -434,8 +495,8 @@ summary{
 
     </div>
 
-    <div class="botband" id="sheetBotBand">
-      <img src="foot_t.png" alt="" id="sheetBotImg">
+    <div class="botband">
+      <img src="foot_t.png" alt="">
       <div class="flag">
         <i></i><i></i><i></i>
       </div>
@@ -448,8 +509,8 @@ summary{
   </div>
 
   <div class="row" id="actions" style="display:none">
-    <button class="alt" id="photo">Salva come Foto (Largo 100%)</button>
-    <button class="alt" id="pdf">Salva PDF (Largo 100%)</button>
+    <button class="alt" id="photo">Salva come Foto</button>
+    <button class="alt" id="pdf">Salva PDF</button>
   </div>
 
   <details id="manualPasteDetails">
@@ -477,7 +538,6 @@ const CATEGORIES = [
 ];
 
 let selectedMenuType = "mittag";
-let currentParsedDishes = [];
 
 /* PARSER MITTAGSTISCH */
 
@@ -637,7 +697,7 @@ function parseEmpfehlungskarte(text){
   return dishes;
 }
 
-/* INIZIALIZZAZIONE UI */
+/* INIZIALIZZAZIONE */
 
 if(typeof document !== "undefined"){
 
@@ -711,16 +771,12 @@ if(typeof document !== "undefined"){
     status("");
   };
 
-  /* VISUALIZZAZIONE ANTEPRIMA MITTAGSTISCH */
+  /* VISUALIZZAZIONE MITTAGSTISCH */
 
   function renderMittag(day,dishes){
 
-    currentParsedDishes = dishes;
     $("sheetDay").style.display = "block";
     $("sheetDay").textContent = day;
-
-    $("sheetBotBand").style.background = "";
-    $("sheetBotImg").style.display = "block";
 
     $("dishes").innerHTML = "";
 
@@ -744,20 +800,18 @@ if(typeof document !== "undefined"){
     $("hint").style.display = "block";
 
     status("Generato: " + dishes.length + " piatti per " + day + ".");
+
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
 
-  /* VISUALIZZAZIONE ANTEPRIMA EMPFEHLUNGSKARTE */
+  /* VISUALIZZAZIONE EMPFEHLUNGSKARTE */
 
   function renderEmpfehlung(dishes){
 
-    currentParsedDishes = dishes;
     $("sheetDay").style.display = "none";
 
-    $("sheetBotBand").style.background = "transparent";
-    $("sheetBotImg").style.display = "none";
-
     const container = $("dishes");
+
     container.innerHTML = "";
 
     let lastCat = "";
@@ -771,13 +825,17 @@ if(typeof document !== "undefined"){
       ){
 
         const catHeader = document.createElement("div");
+
         catHeader.className = "category-title";
         catHeader.textContent = dish.category;
+
         container.appendChild(catHeader);
+
         lastCat = dish.category;
       }
 
       const wrapper = document.createElement("div");
+
       wrapper.className = "dish-wrapper";
 
       const descHtml = dish.desc
@@ -799,7 +857,8 @@ if(typeof document !== "undefined"){
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
 
-    status("Generato: " + dishes.length + " elementi in una singola pagina.");
+    status("Generato: " + dishes.length + " elementi.");
+
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
 
@@ -808,11 +867,13 @@ if(typeof document !== "undefined"){
   $("goMittag").onclick = async () => {
 
     const day = $("dayMittag").value;
+
     status("Lettura dei dati Mittagstisch...");
 
     try{
 
       const targetUrl = $("urlMittag").value.trim();
+
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -821,6 +882,7 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(j.text,day);
 
       if(!dishes.length){
+
         status("Nessun piatto per " + day + " trovato sul sito.",true);
         return;
       }
@@ -828,6 +890,7 @@ if(typeof document !== "undefined"){
       renderMittag(day,dishes);
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
@@ -841,6 +904,7 @@ if(typeof document !== "undefined"){
     try{
 
       const targetUrl = $("urlEmpf").value.trim();
+
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -849,6 +913,7 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(j.text);
 
       if(!dishes.length){
+
         status("Nessun piatto trovato.",true);
         return;
       }
@@ -856,6 +921,7 @@ if(typeof document !== "undefined"){
       renderEmpfehlung(dishes);
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
@@ -872,6 +938,7 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(pasteContent,day);
 
       if(!dishes.length){
+
         status("Nessun piatto Mittagstisch nel testo.",true);
         return;
       }
@@ -883,6 +950,7 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(pasteContent);
 
       if(!dishes.length){
+
         status("Nessun piatto speciale nel testo.",true);
         return;
       }
@@ -895,20 +963,37 @@ if(typeof document !== "undefined"){
 
   async function saveFile(blob,name){
 
-    const file = new File([blob], name, {type:blob.type});
+    const file = new File(
+      [blob],
+      name,
+      {type:blob.type}
+    );
 
-    if(navigator.canShare && navigator.canShare({files:[file]})){
+    if(
+      navigator.canShare &&
+      navigator.canShare({files:[file]})
+    ){
+
       try{
-        await navigator.share({files:[file], title:name});
+
+        await navigator.share({
+          files:[file],
+          title:name
+        });
+
         return;
+
       }catch(e){
+
         if(e.name === "AbortError") return;
       }
     }
 
     const a = document.createElement("a");
+
     a.href = URL.createObjectURL(blob);
     a.download = name;
+
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -920,114 +1005,314 @@ if(typeof document !== "undefined"){
 
   $("photo").onclick = async () => {
 
-    status("Generazione dell'immagine a larghezza piena...");
+    status("Generazione dell'immagine...");
 
     try{
 
       await document.fonts.ready;
-      window.scrollTo(0, 0);
-
-      const isEmpf = $("sheetTitle").textContent.toLowerCase().includes("empfehlung");
-      if (isEmpf) {
-        $("sheetBotBand").style.background = "transparent";
-        $("sheetBotImg").style.display = "none";
-      }
 
       const canvas = await html2canvas($("sheet"),{
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 3, // Ottima qualità e nitidezza
-        scrollY: 0,
-        windowWidth: 1200 // Forza il rendering a schermo largo per evitare bordi stretti
+        useCORS:true,
+        backgroundColor:"#ffffff",
+        scale:2
       });
 
       canvas.toBlob(async blob => {
-        const titleName = selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte";
-        await saveFile(blob, titleName + "_" + stamp() + ".png");
-        status("Immagine a larghezza piena salvata!");
+
+        const titleName = selectedMenuType === "mittag"
+          ? "Mittagstisch"
+          : "Empfehlungskarte";
+
+        await saveFile(
+          blob,
+          titleName + "_" + stamp() + ".png"
+        );
+
+        status("Immagine salvata!");
+
       },"image/png");
 
     }catch(e){
+
       status("Errore: " + e.message,true);
     }
   };
 
-  /* GENERAZIONE PDF: LARGHEZZA PIENA BORDO A BORDO A4 (595.28 pt) */
+  /* ESPORTAZIONE PDF CON LARGHEZZA TOTALMENTE PIENA (BORDO A BORDO) */
 
   $("pdf").onclick = async () => {
 
-    status("Generazione del PDF a larghezza totale assoluta...");
+    status("Generazione del PDF a larghezza totale...");
 
     try{
 
       await document.fonts.ready;
-      window.scrollTo(0, 0);
 
-      const isEmpf = selectedMenuType === "empfehlung";
-      const originalBotBackground = $("sheetBotBand").style.background;
-      const originalBotImgDisplay = $("sheetBotImg").style.display;
-
-      if (isEmpf) {
-        $("sheetBotBand").style.background = "transparent";
-        $("sheetBotImg").style.display = "none";
-      }
-
-      const canvas = await html2canvas($("sheet"), {
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scale: 3,
-        scrollY: 0,
-        windowWidth: 1200
-      });
-
-      if (isEmpf) {
-        $("sheetBotBand").style.background = originalBotBackground;
-        $("sheetBotImg").style.display = originalBotImgDisplay;
-      }
-
-      const { PDFDocument } = PDFLib;
+      const {PDFDocument} = PDFLib;
       const pdfDoc = await PDFDocument.create();
 
-      const pageW = 595.28;
-      const pageH = 841.89;
-      const page = pdfDoc.addPage([pageW, pageH]);
+      const a4Width = 595.28;
+      const a4Height = 841.89;
 
-      const imgData = canvas.toDataURL("image/png");
-      const embeddedImg = await pdfDoc.embedPng(imgData);
+      const titleText = selectedMenuType === "mittag"
+        ? "Mittagstisch"
+        : "Empfehlungskarte";
 
-      // Copre ESATTAMENTE i 595.28 punti di larghezza della pagina A4 (0 margini laterali)
-      const finalW = pageW;
-      let finalH = (canvas.height * finalW) / canvas.width;
+      const subtitleText = selectedMenuType === "mittag"
+        ? "TAGESGERICHTE"
+        : "EMPFEHLUNGEN";
 
-      // Margine inferiore millimetrico e sicuro (30 punti) per mantenere visibile la bandiera italiana sul fondo
-      const bottomMargin = 30;
-      const availableH = pageH - bottomMargin;
+      const dayText = $("sheetDay").textContent;
 
-      if (finalH > availableH) {
-        finalH = availableH;
+      const tempContainer = document.createElement("div");
+      tempContainer.style.position = "absolute";
+      tempContainer.style.top = "-9999px";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.width = "500px";
+      document.body.appendChild(tempContainer);
+
+      if (selectedMenuType === "mittag") {
+
+        const cloneSheet = $("sheet").cloneNode(true);
+        cloneSheet.style.display = "flex";
+        cloneSheet.style.flexDirection = "column";
+        cloneSheet.style.width = "500px";
+        cloneSheet.style.minHeight = "720px";
+        cloneSheet.style.height = "720px";
+        cloneSheet.style.margin = "0";
+        cloneSheet.style.boxShadow = "none";
+
+        tempContainer.appendChild(cloneSheet);
+
+        const dishesDiv = cloneSheet.querySelector("#dishes");
+        dishesDiv.innerHTML = "";
+        cloneSheet.querySelector("#sheetTitle").textContent = titleText;
+        cloneSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        cloneSheet.querySelector("#sheetDay").style.display = "block";
+        cloneSheet.querySelector("#sheetDay").textContent = dayText;
+
+        Array.from($("dishes").children).forEach(el => {
+          dishesDiv.appendChild(el.cloneNode(true));
+        });
+
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const canvas = await html2canvas(cloneSheet, {
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          scale: 2
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const page = pdfDoc.addPage([a4Width, a4Height]);
+        const pngImage = await pdfDoc.embedPng(imgData);
+
+        // LARGHEZZA AL 100% (Bordo a bordo): margin = 0 e larghezza impostata esattamente su a4Width
+        const margin = 0;
+        const maxWidth = a4Width - margin * 2;
+        const maxHeight = a4Height - 25; // Lascia solo un piccolo spazio in basso per la bandiera
+
+        let finalWidth = maxWidth;
+        let finalHeight = canvas.height * finalWidth / canvas.width;
+
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = canvas.width * finalHeight / canvas.height;
+        }
+
+        const xPos = 0; // Azzera i margini laterali
+        const yPos = a4Height - finalHeight; // Ancorato dall'alto verso il basso
+
+        page.drawImage(pngImage, {
+          x: xPos,
+          y: yPos,
+          width: finalWidth,
+          height: finalHeight
+        });
+
+      } else {
+
+        const rawItems = Array.from($("dishes").children);
+        
+        const groups = [];
+        let currentGroup = { header: null, elements: [] };
+
+        rawItems.forEach(el => {
+          if (el.classList.contains("category-title")) {
+            if (currentGroup.header || currentGroup.elements.length > 0) {
+              groups.push(currentGroup);
+            }
+            currentGroup = { header: el, elements: [] };
+          } else {
+            currentGroup.elements.push(el);
+          }
+        });
+        if (currentGroup.header || currentGroup.elements.length > 0) {
+          groups.push(currentGroup);
+        }
+
+        const baseSheet = $("sheet").cloneNode(true);
+        baseSheet.style.display = "flex";
+        baseSheet.style.flexDirection = "column";
+        baseSheet.style.width = "500px";
+        baseSheet.style.minHeight = "720px";
+        baseSheet.style.height = "720px";
+        baseSheet.style.margin = "0";
+        baseSheet.style.boxShadow = "none";
+        baseSheet.classList.add("empf-pdf-compact");
+
+        const baseDishes = baseSheet.querySelector("#dishes");
+        baseDishes.innerHTML = "";
+        baseSheet.querySelector("#sheetTitle").textContent = titleText;
+        baseSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+        baseSheet.querySelector("#sheetDay").style.display = "none";
+
+        tempContainer.appendChild(baseSheet);
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        const innerContainer = baseSheet.querySelector(".inner");
+        const headerSpace = baseSheet.querySelector("#sheetTitle").offsetHeight + 
+                            baseSheet.querySelector("#sheetSubtitle").offsetHeight + 15;
+        
+        const maxContentHeight = innerContainer.clientHeight - headerSpace - 65;
+
+        tempContainer.removeChild(baseSheet);
+
+        let pages = [];
+        let currentPageElements = [];
+        let currentHeight = 0;
+
+        async function measureHeight(node) {
+          const mDiv = document.createElement("div");
+          mDiv.style.width = "450px";
+          mDiv.classList.add("empf-pdf-compact");
+          mDiv.appendChild(node.cloneNode(true));
+          tempContainer.appendChild(mDiv);
+          const h = mDiv.offsetHeight + 4;
+          tempContainer.removeChild(mDiv);
+          return h;
+        }
+
+        for (let g = 0; g < groups.length; g++) {
+          const group = groups[g];
+          let headerHeight = group.header ? await measureHeight(group.header) : 0;
+
+          if (group.header) {
+            const firstDishHeight = group.elements.length > 0 ? await measureHeight(group.elements[0]) : 0;
+            
+            if (currentHeight + headerHeight + firstDishHeight > maxContentHeight && currentPageElements.length > 0) {
+              pages.push(currentPageElements);
+              currentPageElements = [];
+              currentHeight = 0;
+            }
+
+            currentPageElements.push(group.header);
+            currentHeight += headerHeight;
+          }
+
+          for (let e = 0; e < group.elements.length; e++) {
+            const dish = group.elements[e];
+            const dishHeight = await measureHeight(dish);
+
+            if (currentHeight + dishHeight > maxContentHeight && currentPageElements.length > 0) {
+              const lastEl = currentPageElements[currentPageElements.length - 1];
+              if (lastEl && lastEl.classList.contains("category-title")) {
+                currentPageElements.pop();
+                pages.push(currentPageElements);
+                currentPageElements = [lastEl, dish];
+                currentHeight = headerHeight + dishHeight;
+              } else {
+                pages.push(currentPageElements);
+                currentPageElements = [dish];
+                currentHeight = dishHeight;
+              }
+            } else {
+              currentPageElements.push(dish);
+              currentHeight += dishHeight;
+            }
+          }
+        }
+
+        if (currentPageElements.length > 0) {
+          pages.push(currentPageElements);
+        }
+
+        for (let p = 0; p < pages.length; p++) {
+          const pageSheet = $("sheet").cloneNode(true);
+          pageSheet.style.display = "flex";
+          pageSheet.style.flexDirection = "column";
+          pageSheet.style.width = "500px";
+          pageSheet.style.minHeight = "720px";
+          pageSheet.style.height = "720px";
+          pageSheet.style.margin = "0";
+          pageSheet.style.boxShadow = "none";
+          pageSheet.classList.add("empf-pdf-compact");
+
+          const dishesDiv = pageSheet.querySelector("#dishes");
+          dishesDiv.innerHTML = "";
+
+          pageSheet.querySelector("#sheetTitle").textContent = titleText;
+          pageSheet.querySelector("#sheetSubtitle").textContent = subtitleText;
+          pageSheet.querySelector("#sheetDay").style.display = "none";
+
+          pages[p].forEach(el => {
+            dishesDiv.appendChild(el.cloneNode(true));
+          });
+
+          tempContainer.appendChild(pageSheet);
+          await new Promise(resolve => requestAnimationFrame(resolve));
+
+          const canvas = await html2canvas(pageSheet, {
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            scale: 2
+          });
+
+          tempContainer.removeChild(pageSheet);
+
+          const imgData = canvas.toDataURL("image/png");
+          const page = pdfDoc.addPage([a4Width, a4Height]);
+          const pngImage = await pdfDoc.embedPng(imgData);
+
+          // LARGHEZZA AL 100% (Bordo a bordo) anche per le pagine multiple
+          const margin = 0;
+          const maxWidth = a4Width - margin * 2;
+          const maxHeight = a4Height - 25;
+
+          let finalWidth = maxWidth;
+          let finalHeight = canvas.height * finalWidth / canvas.width;
+
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = canvas.width * finalHeight / canvas.height;
+          }
+
+          const xPos = 0;
+          const yPos = a4Height - finalHeight;
+
+          page.drawImage(pngImage, {
+            x: xPos,
+            y: yPos,
+            width: finalWidth,
+            height: finalHeight
+          });
+        }
       }
 
-      const xPos = 0; // Nessuno spazio a sinistra o a destra
-      const yPos = pageH - finalH;
-
-      page.drawImage(embeddedImg, {
-        x: xPos,
-        y: yPos,
-        width: finalW,
-        height: finalH
-      });
+      tempContainer.remove();
 
       const pdfBytes = await pdfDoc.save();
 
       await saveFile(
-        new Blob([pdfBytes], { type: "application/pdf" }),
-        (isEmpf ? "Empfehlungskarte" : "Mittagstisch") + "_" + stamp() + ".pdf"
+        new Blob([pdfBytes], {type: "application/pdf"}),
+        titleText + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato a larghezza totale sfruttando tutta la pagina!");
+      status("PDF a larghezza totale salvato con successo!");
 
     }catch(e){
-      status("Errore PDF: " + e.message, true);
+
+      status("Errore: " + e.message, true);
     }
   };
 
