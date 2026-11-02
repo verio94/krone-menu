@@ -837,7 +837,6 @@ if(typeof document !== "undefined"){
 
     $("sheetDay").style.display = "none";
 
-    // Nasconde la casetta e lo sfondo colorato a schermo per l'Empfehlungskarte
     $("sheetBotBand").style.background = "transparent";
     $("sheetBotImg").style.display = "none";
 
@@ -887,7 +886,7 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 600; 
+      const availableHeight = 560; // Spazio ottimizzato per non tagliare il dessert
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
@@ -1026,7 +1025,6 @@ if(typeof document !== "undefined"){
 
       await document.fonts.ready;
 
-      // Controllo basato sul titolo visualizzato
       if ($("sheetTitle").textContent.toLowerCase().includes("empfehlung")) {
         $("sheetBotBand").style.background = "transparent";
         $("sheetBotImg").style.display = "none";
@@ -1054,7 +1052,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF PULITA (Rimuove casetta e sfondo basandosi sul titolo) */
+  /* ESPORTAZIONE PDF CORRETTA CON SCALA PROPORZIONALE INTERA A4 */
 
   $("pdf").onclick = async () => {
 
@@ -1084,7 +1082,6 @@ if(typeof document !== "undefined"){
       innerClone.style.transform = originalInner.style.transform;
       innerClone.style.transformOrigin = "top center";
 
-      // CONTROLLO DIRETTO SUL TITOLO: rimuove la casetta e lo sfondo se è Empfehlungskarte
       const currentTitle = $("sheetTitle").textContent.toLowerCase();
       if (currentTitle.includes("empfehlung")) {
         const botBandClone = cloneSheet.querySelector("#sheetBotBand");
@@ -1093,7 +1090,7 @@ if(typeof document !== "undefined"){
         }
         const botImgClone = cloneSheet.querySelector("#sheetBotImg");
         if (botImgClone) {
-          botImgClone.remove(); // Rimuove del tutto l'immagine della casetta dal PDF
+          botImgClone.remove();
         }
       }
 
@@ -1120,10 +1117,20 @@ if(typeof document !== "undefined"){
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      const finalWidth = a4Width;
-      const finalHeight = canvas.height * finalWidth / canvas.width;
+      // Margini di sicurezza per far rientrare perfettamente il foglio A4 senza tagli sotto
+      const margin = 15;
+      const maxWidth = a4Width - (margin * 2);
+      const maxHeight = a4Height - (margin * 2);
 
-      const xPos = 0;
+      let finalWidth = maxWidth;
+      let finalHeight = canvas.height * finalWidth / canvas.width;
+
+      if (finalHeight > maxHeight) {
+        finalHeight = maxHeight;
+        finalWidth = canvas.width * finalHeight / canvas.width;
+      }
+
+      const xPos = (a4Width - finalWidth) / 2;
       const yPos = (a4Height - finalHeight) / 2;
 
       page.drawImage(pngImage, {
@@ -1140,7 +1147,7 @@ if(typeof document !== "undefined"){
         (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo in una sola pagina a piena larghezza!");
+      status("PDF generato con successo in una sola pagina senza tagli!");
 
     }catch(e){
       status("Errore: " + e.message, true);
