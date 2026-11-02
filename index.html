@@ -245,4 +245,84 @@ function parseEmpfehlungskarte(text) {
     rangeToSkipStart = mittagStartIdx;
     rangeToSkipEnd = lines.length;
     for (let k = mittagEndIdx + 1; k < lines.length; k++) {
+      if (CATEGORIES.includes(lines[k].toLowerCase())) {
+        rangeToSkipEnd = k;
+        break;
+      }
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    if (i >= rangeToSkipStart && i < rangeToSkipEnd) {
+      continue;
+    }
+    
+    const line = lines[i];
+    const lineLow = line.toLowerCase();
+    
+    if (CATEGORIES.includes(lineLow)) {
+      currentCategory = line;
+      continue;
+    }
+    
+    const priceVal = extractCleanPrice(line);
+    if (priceVal) {
+      let name = "";
+      let desc = "";
+      
+      if (i - 1 >= 0) {
+        name = lines[i - 1];
+        if (CATEGORIES.includes(name.toLowerCase()) || daysLow.includes(name.toLowerCase())) {
+          name = "Specialità dello Chef";
+        }
+      }
+      
+      if (i + 1 < lines.length) {
+        const nextLine = lines[i + 1];
+        if (!extractCleanPrice(nextLine) && !CATEGORIES.includes(nextLine.toLowerCase()) && !daysLow.includes(nextLine.toLowerCase())) {
+          desc = nextLine;
+        }
+      }
+      
+      dishes.push({
+        category: currentCategory || "Empfehlungen",
+        name: name,
+        price: priceVal,
+        desc: desc
+      });
+    }
+  }
+  return dishes;
+}
+
+if (typeof document !== "undefined") {
+  const \$ = id => document.getElementById(id);
   
+  // Inizializzazione dropdown Mittagstisch
+  const selectDay = $("dayMittag");
+  selectDay.innerHTML = "";
+  const todayDe = new Date().toLocaleDateString("de-DE", { weekday: "long", timeZone: "Europe/Berlin" });
+  DAYS.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d; o.textContent = d;
+    selectDay.appendChild(o);
+  });
+  selectDay.value = DAYS.slice(0, 5).includes(todayDe) ? todayDe : "Montag";
+
+  const status = (t, err) => { \$("status").textContent = t; \$("status").className = err ? "err" : ""; };
+
+  // Navigazione Tab
+  $("tabMittag").onclick = () => {
+    selectedMenuType = "mittag";
+    $("tabMittag").classList.add("active");
+    $("tabEmpf").classList.remove("active");
+    $("sectionMittag").classList.add("active");
+    $("sectionEmpf").classList.remove("active");
+    $("mainHeaderTitle").textContent = "Mittagstisch";
+    $("sheetTitle").textContent = "Mittagstisch";
+    $("sheetSubtitle").textContent = "TAGESGERICHTE";
+    status("");
+  };
+
+  $("tabEmpf").onclick = () => {
+    sel
