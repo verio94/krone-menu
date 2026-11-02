@@ -837,7 +837,7 @@ if(typeof document !== "undefined"){
 
     $("sheetDay").style.display = "none";
 
-    // Per l'Empfehlungskarte togliamo subito a schermo la casetta e lo sfondo
+    // Nasconde la casetta e lo sfondo colorato a schermo per l'Empfehlungskarte
     $("sheetBotBand").style.background = "transparent";
     $("sheetBotImg").style.display = "none";
 
@@ -892,7 +892,7 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 560; 
+      const availableHeight = 580; 
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
@@ -1058,12 +1058,6 @@ if(typeof document !== "undefined"){
 
       await document.fonts.ready;
 
-      // Se è Empfehlungskarte rimuoviamo temporaneamente la casetta anche per la foto
-      if (selectedMenuType === "empfehlung") {
-        $("sheetBotBand").style.background = "transparent";
-        $("sheetBotImg").style.display = "none";
-      }
-
       const canvas = await html2canvas($("sheet"),{
         useCORS:true,
         backgroundColor:"#ffffff",
@@ -1091,7 +1085,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF SENZA CASETTA E SENZA SFONDO NELL'EMPFEHLUNGSKARTE */
+  /* ESPORTAZIONE PDF SENZA CASETTA E SENZA SFONDO VIOLA */
 
   $("pdf").onclick = async () => {
 
@@ -1121,16 +1115,14 @@ if(typeof document !== "undefined"){
       innerClone.style.transform = originalInner.style.transform;
       innerClone.style.transformOrigin = "top center";
 
-      // Rimuove completamente lo sfondo e la casetta dal clone PDF se è Empfehlungskarte
-      if (selectedMenuType === "empfehlung") {
-        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
-        if (botBandClone) {
-          botBandClone.style.background = "transparent";
-        }
-        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
-        if (botImgClone) {
-          botImgClone.remove(); // Rimuove del tutto l'elemento immagine della casa
-        }
+      // Rimuove lo sfondo e cancella del tutto l'immagine della casetta nel clone del PDF
+      const botBandClone = cloneSheet.querySelector("#sheetBotBand");
+      if (botBandClone) {
+        botBandClone.style.background = "transparent";
+      }
+      const botImgClone = cloneSheet.querySelector("#sheetBotImg");
+      if (botImgClone) {
+        botImgClone.remove();
       }
 
       const tempContainer = document.createElement("div");
