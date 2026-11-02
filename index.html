@@ -257,7 +257,7 @@ summary{
 /* AREA TESTO */
 
 .inner{
-  padding:19px 30px 10px;
+  padding:15px 25px 10px;
   flex:1;
   min-height:0;
 }
@@ -265,32 +265,32 @@ summary{
 .title{
   text-align:center;
   color:var(--g);
-  font-size:32px;
+  font-size:30px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
   line-height:1.15;
-  margin:0 0 4px;
+  margin:0 0 3px;
 }
 
 .sub{
   text-align:center;
   color:var(--o);
   letter-spacing:.3em;
-  font-size:11px;
+  font-size:10.5px;
   font-weight:700;
   font-family:'Quicksand',sans-serif;
-  padding-bottom:11px;
+  padding-bottom:9px;
   border-bottom:1px solid var(--o);
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .day{
   text-align:center;
   color:var(--g);
-  font-size:23px;
+  font-size:22px;
   font-weight:400;
   font-family:'Quicksand',sans-serif;
-  margin:5px 0 7px;
+  margin:4px 0 6px;
 }
 
 /* PIATTI */
@@ -310,8 +310,8 @@ summary{
   align-items:flex-start;
   gap:12px;
   padding:2px 0;
-  font-size:14px;
-  line-height:1.4;
+  font-size:13.5px;
+  line-height:1.35;
   font-family:'Quicksand',sans-serif;
 }
 
@@ -559,6 +559,24 @@ const CATEGORIES = [
 
 let selectedMenuType = "mittag";
 
+/* FUNZIONE DI RIDIMENSIONAMENTO AUTOMATICO INTELLIGENTE */
+function autoScaleContent(innerElement) {
+  innerElement.style.transform = "none";
+  requestAnimationFrame(() => {
+    // Altezza massima consentita per lasciare ampio respiro e margine di sicurezza in basso (circa 2 cm)
+    const maxAllowedHeight = 445; 
+    const currentHeight = innerElement.scrollHeight;
+    
+    if (currentHeight > maxAllowedHeight) {
+      const scaleFactor = Math.max(0.5, maxAllowedHeight / currentHeight);
+      innerElement.style.transform = `scale(${scaleFactor})`;
+      innerElement.style.transformOrigin = "top center";
+    } else {
+      innerElement.style.transform = "none";
+    }
+  });
+}
+
 /* PARSER MITTAGSTISCH */
 
 function parseMittagstisch(text, day){
@@ -800,7 +818,6 @@ if(typeof document !== "undefined"){
 
     const inner = $("sheetInner");
     inner.style.transform = "none";
-    inner.style.transformOrigin = "top center";
 
     $("sheetBotBand").style.background = "";
     $("sheetBotImg").style.display = "block";
@@ -826,8 +843,9 @@ if(typeof document !== "undefined"){
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
 
-    status("Generato: " + dishes.length + " piatti per " + day + ".");
+    autoScaleContent(inner);
 
+    status("Generato: " + dishes.length + " piatti per " + day + ".");
     $("sheet").scrollIntoView({behavior:"smooth"});
   }
 
@@ -883,20 +901,7 @@ if(typeof document !== "undefined"){
     $("hint").style.display = "block";
 
     const inner = $("sheetInner");
-    inner.style.transform = "none";
-    
-    requestAnimationFrame(() => {
-      const availableHeight = 520; // Altezza ridotta per garantire che entri comodamente con margine
-      const currentHeight = inner.scrollHeight;
-      
-      if (currentHeight > availableHeight) {
-        const scaleFactor = Math.max(0.55, availableHeight / currentHeight);
-        inner.style.transform = `scale(${scaleFactor})`;
-        inner.style.transformOrigin = "top center";
-      } else {
-        inner.style.transform = "none";
-      }
-    });
+    autoScaleContent(inner);
 
     status("Generato: " + dishes.length + " elementi in una singola pagina.");
     $("sheet").scrollIntoView({behavior:"smooth"});
@@ -1052,7 +1057,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF CON MARGINE DI SICUREZZA DI CIRCA 2 CM SUL FONDO */
+  /* ESPORTAZIONE PDF CON CALCOLO SCALA AUTOMATICO SUL CLONE */
 
   $("pdf").onclick = async () => {
 
@@ -1077,11 +1082,6 @@ if(typeof document !== "undefined"){
       cloneSheet.style.margin = "0";
       cloneSheet.style.boxShadow = "none";
 
-      const innerClone = cloneSheet.querySelector("#sheetInner");
-      const originalInner = $("sheetInner");
-      innerClone.style.transform = originalInner.style.transform;
-      innerClone.style.transformOrigin = "top center";
-
       const currentTitle = $("sheetTitle").textContent.toLowerCase();
       if (currentTitle.includes("empfehlung")) {
         const botBandClone = cloneSheet.querySelector("#sheetBotBand");
@@ -1103,7 +1103,11 @@ if(typeof document !== "undefined"){
 
       tempContainer.appendChild(cloneSheet);
 
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      // Applica lo stesso ridimensionamento automatico anche al clone del PDF in tempo reale
+      const innerClone = cloneSheet.querySelector("#sheetInner");
+      autoScaleContent(innerClone);
+
+      await new Promise(resolve => setTimeout(resolve, 50)); // Attende che il layout si assesti
 
       const canvas = await html2canvas(cloneSheet, {
         useCORS: true,
@@ -1117,8 +1121,8 @@ if(typeof document !== "undefined"){
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      // Margine di sicurezza di circa 2 cm (55 punti) per evitare qualsiasi taglio in basso e in alto
-      const margin = 55;
+      // Margine di sicurezza generoso (circa 2 cm - 60 punti) per garantire che nulla tocchi i bordi
+      const margin = 60;
       const maxWidth = a4Width - (margin * 2);
       const maxHeight = a4Height - (margin * 2);
 
@@ -1131,7 +1135,6 @@ if(typeof document !== "undefined"){
       }
 
       const xPos = (a4Width - finalWidth) / 2;
-      // Posizionamento centrato verticalmente con ampio respiro e margine di sicurezza inferiore
       const yPos = (a4Height - finalHeight) / 2;
 
       page.drawImage(pngImage, {
@@ -1148,7 +1151,7 @@ if(typeof document !== "undefined"){
         (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo con margine di sicurezza!");
+      status("PDF generato con successo con scala automatica e margine di sicurezza!");
 
     }catch(e){
       status("Errore: " + e.message, true);
