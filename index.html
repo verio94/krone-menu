@@ -368,6 +368,30 @@ summary{
   margin-top:8px;
 }
 
+/* OTTIMIZZAZIONE SPAZI EMPFEHLUNGSKARTE */
+.empfehlung-mode .inner {
+  padding: 10px 24px 5px !important;
+}
+
+.empfehlung-mode .category-title {
+  margin: 10px 0 4px !important;
+  padding-bottom: 2px !important;
+  font-size: 13.5px !important;
+}
+
+.empfehlung-mode .dish-wrapper {
+  padding: 3px 0 !important;
+}
+
+.empfehlung-mode .dish {
+  padding: 1px 0 !important;
+}
+
+.empfehlung-mode .desc {
+  margin-top: 1px !important;
+  font-size: 10px !important;
+}
+
 /* STAMPA A4 */
 
 @media print{
@@ -760,6 +784,7 @@ if(typeof document !== "undefined"){
   $("tabMittag").onclick = () => {
 
     selectedMenuType = "mittag";
+    $("sheet").classList.remove("empfehlung-mode");
 
     $("tabMittag").classList.add("active");
     $("tabEmpf").classList.remove("active");
@@ -777,6 +802,7 @@ if(typeof document !== "undefined"){
   $("tabEmpf").onclick = () => {
 
     selectedMenuType = "empfehlung";
+    $("sheet").classList.add("empfehlung-mode");
 
     $("tabEmpf").classList.add("active");
     $("tabMittag").classList.remove("active");
@@ -802,7 +828,6 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     inner.style.transformOrigin = "top center";
 
-    // Mostra la banda inferiore completa per il Mittagstisch
     $("sheetBotBand").style.background = "";
     $("sheetBotImg").style.display = "block";
 
@@ -837,13 +862,12 @@ if(typeof document !== "undefined"){
   function renderEmpfehlung(dishes){
 
     $("sheetDay").style.display = "none";
+    $("sheet").classList.add("empfehlung-mode");
 
-    // Per l'Empfehlungskarte rimuoviamo la casetta e lo sfondo celestino anche a schermo
     $("sheetBotBand").style.background = "transparent";
     $("sheetBotImg").style.display = "none";
 
     const container = $("dishes");
-
     container.innerHTML = "";
 
     let lastCat = "";
@@ -857,17 +881,14 @@ if(typeof document !== "undefined"){
       ){
 
         const catHeader = document.createElement("div");
-
         catHeader.className = "category-title";
         catHeader.textContent = dish.category;
 
         container.appendChild(catHeader);
-
         lastCat = dish.category;
       }
 
       const wrapper = document.createElement("div");
-
       wrapper.className = "dish-wrapper";
 
       const descHtml = dish.desc
@@ -889,12 +910,11 @@ if(typeof document !== "undefined"){
     $("actions").style.display = "flex";
     $("hint").style.display = "block";
 
-    // Adattamento proporzionale automatico se il contenuto supera lo spazio della pagina
     const inner = $("sheetInner");
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 620; // Spazio verticale utile ampliato senza casetta
+      const availableHeight = 620; 
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
@@ -916,13 +936,11 @@ if(typeof document !== "undefined"){
   $("goMittag").onclick = async () => {
 
     const day = $("dayMittag").value;
-
     status("Lettura dei dati Mittagstisch...");
 
     try{
 
       const targetUrl = $("urlMittag").value.trim();
-
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -931,7 +949,6 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(j.text,day);
 
       if(!dishes.length){
-
         status("Nessun piatto per " + day + " trovato sul sito.",true);
         return;
       }
@@ -939,7 +956,6 @@ if(typeof document !== "undefined"){
       renderMittag(day,dishes);
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
@@ -953,7 +969,6 @@ if(typeof document !== "undefined"){
     try{
 
       const targetUrl = $("urlEmpf").value.trim();
-
       const r = await fetch("/api/menu?url=" + encodeURIComponent(targetUrl));
       const j = await r.json();
 
@@ -962,7 +977,6 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(j.text);
 
       if(!dishes.length){
-
         status("Nessun piatto trovato.",true);
         return;
       }
@@ -970,7 +984,6 @@ if(typeof document !== "undefined"){
       renderEmpfehlung(dishes);
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
@@ -987,7 +1000,6 @@ if(typeof document !== "undefined"){
       const dishes = parseMittagstisch(pasteContent,day);
 
       if(!dishes.length){
-
         status("Nessun piatto Mittagstisch nel testo.",true);
         return;
       }
@@ -999,7 +1011,6 @@ if(typeof document !== "undefined"){
       const dishes = parseEmpfehlungskarte(pasteContent);
 
       if(!dishes.length){
-
         status("Nessun piatto speciale nel testo.",true);
         return;
       }
@@ -1012,37 +1023,20 @@ if(typeof document !== "undefined"){
 
   async function saveFile(blob,name){
 
-    const file = new File(
-      [blob],
-      name,
-      {type:blob.type}
-    );
+    const file = new File([blob], name, {type:blob.type});
 
-    if(
-      navigator.canShare &&
-      navigator.canShare({files:[file]})
-    ){
-
+    if(navigator.canShare && navigator.canShare({files:[file]})){
       try{
-
-        await navigator.share({
-          files:[file],
-          title:name
-        });
-
+        await navigator.share({files:[file], title:name});
         return;
-
       }catch(e){
-
         if(e.name === "AbortError") return;
       }
     }
 
     const a = document.createElement("a");
-
     a.href = URL.createObjectURL(blob);
     a.download = name;
-
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1072,22 +1066,17 @@ if(typeof document !== "undefined"){
           ? "Mittagstisch"
           : "Empfehlungskarte";
 
-        await saveFile(
-          blob,
-          titleName + "_" + stamp() + ".png"
-        );
-
+        await saveFile(blob, titleName + "_" + stamp() + ".png");
         status("Immagine salvata!");
 
       },"image/png");
 
     }catch(e){
-
       status("Errore: " + e.message,true);
     }
   };
 
-  /* ESPORTAZIONE PDF: PAGINA UNICA SENZA CASETTA PER L'EMPFEHLUNGSKARTE */
+  /* ESPORTAZIONE PDF */
 
   $("pdf").onclick = async () => {
 
@@ -1103,52 +1092,17 @@ if(typeof document !== "undefined"){
       const a4Width = 595.28;
       const a4Height = 841.89;
 
-      const cloneSheet = $("sheet").cloneNode(true);
-      cloneSheet.style.display = "flex";
-      cloneSheet.style.flexDirection = "column";
-      cloneSheet.style.width = "500px";
-      cloneSheet.style.minHeight = "720px";
-      cloneSheet.style.height = "720px";
-      cloneSheet.style.margin = "0";
-      cloneSheet.style.boxShadow = "none";
-
-      // Se è Empfehlungskarte rimuoviamo la casetta e lo sfondo celestino dal PDF clonato
-      if (selectedMenuType === "empfehlung") {
-        const innerClone = cloneSheet.querySelector("#sheetInner");
-        const originalInner = $("sheetInner");
-        innerClone.style.transform = originalInner.style.transform;
-        innerClone.style.transformOrigin = "top center";
-
-        const botBandClone = cloneSheet.querySelector("#sheetBotBand");
-        botBandClone.style.background = "transparent";
-        const botImgClone = cloneSheet.querySelector("#sheetBotImg");
-        if (botImgClone) botImgClone.style.display = "none";
-      }
-
-      const tempContainer = document.createElement("div");
-      tempContainer.style.position = "absolute";
-      tempContainer.style.top = "-9999px";
-      tempContainer.style.left = "-9999px";
-      tempContainer.style.width = "500px";
-      document.body.appendChild(tempContainer);
-
-      tempContainer.appendChild(cloneSheet);
-
-      await new Promise(resolve => requestAnimationFrame(resolve));
-
-      const canvas = await html2canvas(cloneSheet, {
+      const canvas = await html2canvas($("sheet"), {
         useCORS: true,
         backgroundColor: "#ffffff",
         scale: 2
       });
 
-      tempContainer.remove();
-
       const imgData = canvas.toDataURL("image/png");
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      const margin = 12;
+      const margin = 10;
       const maxWidth = a4Width - margin * 2;
       const maxHeight = a4Height - margin * 2;
 
@@ -1180,7 +1134,6 @@ if(typeof document !== "undefined"){
       status("PDF generato con successo in una sola pagina!");
 
     }catch(e){
-
       status("Errore: " + e.message, true);
     }
   };
