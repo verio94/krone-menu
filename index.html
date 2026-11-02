@@ -296,7 +296,7 @@ summary{
 /* PIATTI */
 
 .dish-wrapper{
-  padding:5px 0;
+  padding:4px 0;
   border-bottom:1px solid #e8e8e8;
 }
 
@@ -336,25 +336,25 @@ summary{
 }
 
 .desc{
-  font-size:10.5px;
+  font-size:10px;
   color:#666;
   font-style:italic;
-  margin-top:2px;
+  margin-top:1px;
   text-align:left;
   outline:none;
   font-family:'Quicksand',sans-serif;
-  line-height:1.35;
+  line-height:1.3;
 }
 
 /* CATEGORIE */
 
 .category-title{
   color:var(--darkgold);
-  font-size:15px;
+  font-size:14px;
   font-weight:700;
-  margin:14px 0 6px;
+  margin:10px 0 4px;
   border-bottom:1px dashed var(--o);
-  padding-bottom:4px;
+  padding-bottom:3px;
   text-transform:uppercase;
   font-family:'Quicksand',sans-serif;
   text-align:center;
@@ -886,11 +886,11 @@ if(typeof document !== "undefined"){
     inner.style.transform = "none";
     
     requestAnimationFrame(() => {
-      const availableHeight = 560; // Spazio ottimizzato per non tagliare il dessert
+      const availableHeight = 520; // Altezza ridotta per garantire che entri comodamente con margine
       const currentHeight = inner.scrollHeight;
       
       if (currentHeight > availableHeight) {
-        const scaleFactor = Math.max(0.6, availableHeight / currentHeight);
+        const scaleFactor = Math.max(0.55, availableHeight / currentHeight);
         inner.style.transform = `scale(${scaleFactor})`;
         inner.style.transformOrigin = "top center";
       } else {
@@ -1052,7 +1052,7 @@ if(typeof document !== "undefined"){
     }
   };
 
-  /* ESPORTAZIONE PDF CORRETTA CON SCALA PROPORZIONALE INTERA A4 */
+  /* ESPORTAZIONE PDF CON MARGINE DI SICUREZZA DI CIRCA 2 CM SUL FONDO */
 
   $("pdf").onclick = async () => {
 
@@ -1117,8 +1117,8 @@ if(typeof document !== "undefined"){
       const page = pdfDoc.addPage([a4Width, a4Height]);
       const pngImage = await pdfDoc.embedPng(imgData);
 
-      // Margini di sicurezza per far rientrare perfettamente il foglio A4 senza tagli sotto
-      const margin = 15;
+      // Margine di sicurezza di circa 2 cm (55 punti) per evitare qualsiasi taglio in basso e in alto
+      const margin = 55;
       const maxWidth = a4Width - (margin * 2);
       const maxHeight = a4Height - (margin * 2);
 
@@ -1127,10 +1127,11 @@ if(typeof document !== "undefined"){
 
       if (finalHeight > maxHeight) {
         finalHeight = maxHeight;
-        finalWidth = canvas.width * finalHeight / canvas.width;
+        finalWidth = canvas.width * finalHeight / canvas.height;
       }
 
       const xPos = (a4Width - finalWidth) / 2;
+      // Posizionamento centrato verticalmente con ampio respiro e margine di sicurezza inferiore
       const yPos = (a4Height - finalHeight) / 2;
 
       page.drawImage(pngImage, {
@@ -1147,7 +1148,7 @@ if(typeof document !== "undefined"){
         (selectedMenuType === "mittag" ? "Mittagstisch" : "Empfehlungskarte") + "_" + stamp() + ".pdf"
       );
 
-      status("PDF generato con successo in una sola pagina senza tagli!");
+      status("PDF generato con successo con margine di sicurezza!");
 
     }catch(e){
       status("Errore: " + e.message, true);
