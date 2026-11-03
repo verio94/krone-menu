@@ -383,7 +383,7 @@ summary{
 
 .empf-pdf-compact .topband{padding:8px 0 !important}
 .empf-pdf-compact .topband img{width:32% !important}
-.empf-pdf-compact .inner{padding:10px 22px 2px !important}
+.empf-pdf-compact .inner{padding:48px 22px 48px !important} /* 48px = 2 cm su foglio A4 */
 .empf-pdf-compact .title{font-size:24px !important;margin-bottom:2px !important}
 .empf-pdf-compact .sub{padding-bottom:6px !important;margin-bottom:6px !important}
 .empf-pdf-compact .category-title{font-size:13px !important;margin:6px 0 3px 0 !important}
@@ -1225,26 +1225,30 @@ if(typeof document !== "undefined"){
           dishesDiv.appendChild(el.cloneNode(true));
         });
 
+        // Racchiudo il contenuto: così il margine di sicurezza non viene mai ridotto
+        const wrap = document.createElement("div");
+        while(innerClone.firstChild) wrap.appendChild(innerClone.firstChild);
+        innerClone.appendChild(wrap);
+
         await new Promise(resolve => requestAnimationFrame(resolve));
 
-        // Se il foglio è più alto di un A4, riduco il contenuto
+        // Se il foglio è più alto di un A4, riduco solo il contenuto
         // allargando il box, così resta a tutta larghezza
         const over = cloneSheet.offsetHeight - SHEET_H;
 
         if(over > 0){
 
-          const ih = innerClone.offsetHeight;
-          const target = ih - over;
+          const wh = wrap.offsetHeight;
+          const target = wh - over;
 
           if(target > 50){
 
-            const s = target / ih;
+            const sc = target / wh;
 
-            innerClone.style.flex = "none";
-            innerClone.style.height = target + "px";
-            innerClone.style.width = (100 / s) + "%";
-            innerClone.style.transformOrigin = "top left";
-            innerClone.style.transform = "scale(" + s + ")";
+            wrap.style.height = target + "px";
+            wrap.style.width = (100 / sc) + "%";
+            wrap.style.transformOrigin = "top left";
+            wrap.style.transform = "scale(" + sc + ")";
           }
         }
 
