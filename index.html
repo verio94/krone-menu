@@ -413,6 +413,7 @@ summary{
     print-color-adjust:exact;
   }
 
+  header,
   main>*:not(#sheet),
   .hint{
     display:none!important;
@@ -1232,23 +1233,81 @@ if(typeof document !== "undefined"){
 
         await new Promise(resolve => requestAnimationFrame(resolve));
 
-        // Se il foglio è più alto di un A4, riduco solo il contenuto
-        // allargando il box, così resta a tutta larghezza
-        const over = cloneSheet.offsetHeight - SHEET_H;
+        if(!isMittag){
 
-        if(over > 0){
+          // EMPFEHLUNGSKARTE: il contenuto occupa tutto lo spazio tra la banda del logo
+          // e la bandiera, in larghezza e in altezza. Si ingrandisce se c'è spazio,
+          // si riduce solo se non ci sta. I 2 cm di margine restano fissi.
 
-          const wh = wrap.offsetHeight;
-          const target = wh - over;
+          const topEl = cloneSheet.querySelector(".topband");
+          const botEl = cloneSheet.querySelector("#sheetBotBand");
+          const cs = getComputedStyle(innerClone);
 
-          if(target > 50){
+          const avail = SHEET_H
+            - topEl.offsetHeight
+            - botEl.offsetHeight
+            - parseFloat(cs.paddingTop)
+            - parseFloat(cs.paddingBottom);
 
-            const sc = target / wh;
+          wrap.style.height = "auto";
 
-            wrap.style.height = target + "px";
+          // altezza visiva del contenuto con fattore di scala sc (larghezza sempre piena)
+          const visualHeight = sc => {
             wrap.style.width = (100 / sc) + "%";
-            wrap.style.transformOrigin = "top left";
-            wrap.style.transform = "scale(" + sc + ")";
+            return wrap.offsetHeight * sc;
+          };
+
+          const MIN_SC = 0.4;
+          const MAX_SC = 2.2;
+
+          let best = MIN_SC;
+
+          if(visualHeight(MAX_SC) <= avail){
+
+            best = MAX_SC;
+
+          }else{
+
+            let lo = MIN_SC;
+            let hi = MAX_SC;
+
+            for(let k=0;k<14;k++){
+
+              const mid = (lo + hi) / 2;
+
+              if(visualHeight(mid) <= avail){
+                best = mid;
+                lo = mid;
+              }else{
+                hi = mid;
+              }
+            }
+          }
+
+          wrap.style.width = (100 / best) + "%";
+          wrap.style.height = avail + "px";
+          wrap.style.transformOrigin = "top left";
+          wrap.style.transform = "scale(" + best + ")";
+
+        }else{
+
+          // MITTAGSTISCH: solo riduzione se il foglio è più alto di un A4
+          const over = cloneSheet.offsetHeight - SHEET_H;
+
+          if(over > 0){
+
+            const wh = wrap.offsetHeight;
+            const target = wh - over;
+
+            if(target > 50){
+
+              const sc = target / wh;
+
+              wrap.style.height = target + "px";
+              wrap.style.width = (100 / sc) + "%";
+              wrap.style.transformOrigin = "top left";
+              wrap.style.transform = "scale(" + sc + ")";
+            }
           }
         }
 
